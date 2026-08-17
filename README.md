@@ -25,10 +25,11 @@ Antecipar esse comportamento permite que a empresa direcione esforços de reten�
 ### Metodologia Diferenciada
 Este pipeline se destaca por:
 
-- ✅ **Janela temporal dupla** — observação e predição estritamente separadas (12 meses de histórico + 6 meses de previsão)
-- ✅ **Validação empírica** — demonstra quantitativamente o filtro de compradores únicos
-- ✅ **Protocolo multi-métrica** — avalia AUC, F1-Macro, MCC, G-Mean, Kappa e Precision-Recall em conjunto
-- ✅ **Representatividade do balanceamento** — etapa rara em estudos aplicados, mas essencial para validade interna
+- ✅ **Janela temporal dupla** — observação (set/2016 a dez/2017, ~16 meses) e predição (jan a mai/2018, 5 meses) estritamente separadas
+- ✅ **Validação empírica** — demonstra quantitativamente, por ablação, que excluir compradores únicos melhora o modelo (não apenas argumento teórico)
+- ✅ **Protocolo multi-métrica** — avalia AUC, F1-Macro, MCC, G-Mean, Kappa e Average Precision em conjunto, com análise de correlação de Spearman entre rankings
+- ✅ **Representatividade do balanceamento** — validação por PSI e KS-test, etapa rara em estudos aplicados, mas essencial para validade interna
+- ✅ **Estabilidade da importância de features** — checagem em 30 partições estratificadas e comparação com importância por permutação, em vez de tratar a concordância Gini/SHAP como validação independente
 
 ---
 
@@ -37,7 +38,13 @@ Este pipeline se destaca por:
 ```
 tcc-mba-usp/
 ├── notebook/
-│   └── olist_churn_prediction.ipynb    # Notebook principal com análise completa
+│   ├── olist_churn_prediction.ipynb           # Notebook principal com análise completa
+│   ├── olist_churn_predictions.csv            # Predições geradas pelo modelo final (1.178 clientes)
+│   ├── docs/                                  # Versões do texto do TCC e análises de apoio
+│   │   ├── tcc_churn_v6.1.md / .docx / .pdf
+│   │   ├── analise_distribuicao_score_churn.md
+│   │   └── analise_waterfall_shap.md
+│   └── imgs/                                  # Imagens de apoio (diagrama entidade-relacionamento etc.)
 ├── data/
 │   ├── olist_customers_dataset.csv
 │   ├── olist_orders_dataset.csv
@@ -46,11 +53,14 @@ tcc-mba-usp/
 │   ├── olist_order_reviews_dataset.csv
 │   ├── olist_products_dataset.csv
 │   ├── olist_sellers_dataset.csv
+│   ├── olist_geolocation_dataset.csv
 │   └── product_category_name_translation.csv
 ├── requirements.txt                     # Dependências do projeto
 ├── guia_notebook.md                     # Documentação técnica detalhada
 └── README.md                            # Este arquivo
 ```
+
+> As figuras citadas no TCC (`figura1_pipeline.png`, `figura2_janelas.png`, `figura9_scores.png`) não ficam versionadas prontas: são geradas na pasta `notebook/` ao executar as células correspondentes (Seções 9 e final do notebook).
 
 ---
 
@@ -58,20 +68,21 @@ tcc-mba-usp/
 
 ### Bibliotecas Principais
 
+Efetivamente importadas e usadas pelo notebook:
+
 ```
 Python 3.8+
 pandas           # Manipulação e transformação de dados
 numpy            # Computação numérica
-scikit-learn     # Modelos de ML, métricas e pré-processamento
+scikit-learn     # Os 10 algoritmos do benchmark, métricas e pré-processamento
+imbalanced-learn # SMOTE, usado na comparação de estratégias de balanceamento (Seção 6)
 matplotlib       # Visualização de gráficos
 seaborn          # Visualização estatística avançada
-xgboost          # Gradient boosting
-imbalanced-learn # Tratamento de desbalanceamento
-pycaret          # AutoML e experimentação rápida
-shap             # Explicabilidade de modelos (SHAP values)
-scipy            # Testes estatísticos (PSI, KS-test)
-joblib           # Serialização de modelos
+shap             # Explicabilidade de modelos (SHAP values, Seção 8.6)
+scipy            # Testes estatísticos (correlação de Spearman, PSI, KS-test)
 ```
+
+`requirements.txt` também instala `pycaret`, `xgboost`, `joblib`, `ipython` e `ipywidgets` para dar suporte ao ambiente Jupyter e a experimentos futuros, mas `pycaret` e `xgboost` não são usados na versão atual do notebook.
 
 ### Instalação
 
@@ -140,25 +151,54 @@ O notebook foi desenvolvido com foco em reprodutibilidade:
 - **Satisfação**: Média de avaliações
 - **Padrão de Pagamento**: Modalidade, parcelamento
 - **Engajamento**: Diversidade de categorias
-- **Churn**: Variável alvo (não comprou nos 6 meses seguintes)
+- **Churn**: Variável alvo (não comprou na janela de predição de 5 meses seguintes, jan a mai/2018)
 
 ---
 
 ## 📈 Etapas da Análise
 
-O notebook é estruturado em **11 seções principais**:
+O notebook segue **12 seções principais** (algumas com subseções de validação empírica):
 
-0. **Imports e Configurações** — Carregamento de bibliotecas e parâmetros globais
-1. **Carregamento de Dados** — Leitura dos CSVs relacionais
-2. **Exploração Inicial** — Estatísticas descritivas e qualidade dos dados
-3. **Limpeza e Tratamento** — Tratamento de valores ausentes, duplicatas, outliers
-4. **Feature Engineering** — Criação de variáveis comportamentais
-5. **Análise Descritiva** — Características dos churners vs. retentores
-6. **Balanceamento de Classes** — Técnicas para dataset desbalanceado
-7. **Pré-Processamento** — Normalização, encoding, seleção de features
-8. **Modelagem** — Treinamento de 10+ algoritmos
-9. **Validação** — Avaliação com métricas múltiplas
-10. **Explicabilidade** — SHAP values e interpretação de features
+| Seção | Conteúdo |
+|-------|----------|
+| 0 | Imports e configurações globais (janelas temporais, paleta de cores, seed) |
+| 1 | Carregamento das seis tabelas relacionais da Olist |
+| 1.1 | Consultas exploratórias: volumetria, recorrência de compra e diversidade de categorias |
+| 2 | Limpeza, conversão de datas e split temporal (observação × predição) |
+| 3 | Feature engineering: as onze variáveis RFM + comportamentais |
+| 4 | Definição do target (`churn`) e filtro `frequency ≥ 2` |
+| 4.1 | Validação empírica da exclusão de compradores únicos (ablação) |
+| 5 | Análise exploratória dos dados (EDA) — Ativos vs. Churn |
+| 6 | Pré-processamento, balanceamento e comparação empírica de estratégias (30 splits) |
+| 7 | Benchmark dos dez algoritmos, curvas ROC/PR e ponto de corte ótimo |
+| 7.1 | Robustez do ranking: correlação de Spearman entre AUC, MCC, G-Mean e Kappa |
+| 8 | Interpretabilidade via importância de Gini (Random Forest) |
+| 8.5 | Validação de representatividade do undersampling (PSI e KS-test) |
+| 8.6 | Análise SHAP (direção dos efeitos, dependence e waterfall plots) |
+| — | Estabilidade da importância entre 30 partições e comparação com importância por permutação |
+| 9 | Score de churn, segmentação de risco em quatro faixas e diagnósticos de validação |
+| 10 | Exportação do CSV de predições |
+
+Para o passo a passo detalhado célula a célula, com números da execução mais recente, ver **[guia_notebook.md](guia_notebook.md)**.
+
+---
+
+## 🏆 Principais Resultados
+
+Números da execução de referência (seed 42), sobre a base filtrada de **1.178 clientes** (1.128 Churn, 50 Ativos):
+
+| Indicador | Valor |
+|-----------|-------|
+| Modelo selecionado | Random Forest |
+| ROC-AUC (hold-out) | 0,8106 |
+| Recall Churn | 97,4% |
+| MCC / Kappa (hold-out) | 0,1931 / 0,1918 |
+| Limiar de decisão adotado | 0,38 (derivado do treino, maximiza Kappa) |
+| Features mais importantes (Gini) | `frequency` (23,2%), `recency_days` (12,2%), `n_categories` (11,9%) |
+| Representatividade do undersampling | 8 de 9 features com PSI < 0,10; nenhuma distorcida |
+| Clientes segmentados | 1.178, em 4 faixas de risco (🟢 Baixo 2,3% · 🟡 Médio 8,6% · 🟠 Alto 31,0% · 🔴 Crítico 58,1%) |
+
+O Random Forest não é o melhor modelo em todas as métricas: a Regressão Logística lidera em MCC e Kappa, e o HistGradient Boosting em G-Mean. A escolha por AUC é justificada, mas não confirmada de forma unânime pelas métricas robustas (Seção 7.1); detalhes em [guia_notebook.md](guia_notebook.md).
 
 ---
 
@@ -200,4 +240,4 @@ Este projeto é fornecido para fins educacionais e de pesquisa.
 
 ---
 
-**Última atualização**: 2024
+**Última atualização**: 2026
