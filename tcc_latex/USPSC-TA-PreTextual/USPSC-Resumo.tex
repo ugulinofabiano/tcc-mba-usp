@@ -1,0 +1,18 @@
+%% USPSC-Resumo.tex
+\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+	\begin{flushleft}
+			\setlength{\absparsep}{0pt}
+			\SingleSpacing
+			\imprimirautorabr~~\textbf{\imprimirtituloresumo}.	\imprimirdata. \pageref{LastPage} p.
+			\imprimirtipotrabalho~-~\imprimirinstituicao, \imprimirlocal, \imprimirdata.
+	\end{flushleft}
+\OnehalfSpacing
+
+A retenção de clientes constitui fator crítico para a sustentabilidade financeira de organizações de comércio eletrônico, uma vez que o custo de aquisição de novos clientes supera substancialmente o de manutenção dos existentes. A capacidade de antecipar quais clientes apresentam maior propensão ao abandono (churn) torna-se decisiva para a adoção de estratégias proativas de relacionamento. O objetivo deste trabalho é identificar e caracterizar, de forma antecipada e a partir de dados históricos de transações, o perfil dos clientes com maior risco de abandono e o dos que retornam à plataforma. Propõe-se um pipeline completo de análise preditiva aplicado a um conjunto de dados públicos do comércio eletrônico brasileiro (Olist), fundamentado na engenharia de variáveis comportamentais e em uma estratégia de janelas temporais que previne o vazamento de informação (data leakage) entre os períodos de observação e predição. O estudo compara sistematicamente diferentes algoritmos de aprendizado de máquina, adota técnicas para lidar com o desbalanceamento acentuado entre as classes e emprega um protocolo de avaliação com múltiplas métricas adequadas a esse cenário, complementado por análise de explicabilidade (XAI). Os principais resultados demonstram que modelos ensemble baseados em árvores alcançam, a partir de variáveis comportamentais simples, o melhor desempenho discriminativo entre os algoritmos avaliados (ROC-AUC de 0,81 no conjunto de teste, com média de 0,67 em trinta partições independentes), e que a diversidade de categorias de compra figura entre os fatores mais associados à retenção, mantendo-se entre os três principais preditores em 29 de trinta partições, achado de implicação direta para estratégias de fidelização. A escolha do modelo de produção é sustentada pela qualidade da ordenação dos clientes por risco, verificada em cobertura fixa contra os dois modelos concorrentes de melhor desempenho sob métricas de decisão binária. O trabalho contribui ainda com a validação empírica das decisões metodológicas adotadas ao longo do pipeline.
+
+	\vspace{\onelineskip}
+
+	\noindent
+	\textbf{Palavras-chave}: churn; aprendizado de máquina; retenção de clientes; RFM; e-commerce; explicabilidade.
+\end{resumo}

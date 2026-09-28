@@ -1,0 +1,86 @@
+%% USPSC-pre-textual-ICMC.tex
+%% Dados do trabalho: tipo de documento, area de concentracao, preambulo, titulacao.
+%%
+%% ATENCAO: este arquivo e carregado pela classe USPSC ANTES do \usepackage[utf8]{inputenc}.
+%% Por isso os acentos sao escritos com sequencias de escape do LaTeX (\^e, \'a, \c{c}, \~a)
+%% e NAO em UTF-8 direto. Os demais arquivos do projeto usam UTF-8 normalmente.
+
+\instituicao{Instituto de Ci\^encias Matem\'aticas e de Computa\c{c}\~ao, Universidade de S\~ao Paulo}
+\unidade{INSTITUTO DE CI\^ENCIAS MATEM\'ATICAS E DE COMPUTA\c{C}\~AO}
+\unidademin{Instituto de Ci\^encias Matem\'aticas e de Computa\c{c}\~ao}
+\universidademin{Universidade de S\~ao Paulo}
+\setorpos{SERVI\c{C}O DE P\'OS-GRADUA\c{C}\~AO DO ICMC-USP}
+
+\notafolharosto{Vers\~ao original}
+\notafolharostoadic{Original version}
+%Para a versao revisada, comente as duas linhas acima e descomente as duas abaixo
+%\notafolharosto{Vers\~ao revisada}
+%\notafolharostoadic{Final version}
+
+% ---
+% dados complementares para CAPA e FOLHA DE ROSTO
+% ---
+\universidade{UNIVERSIDADE DE S\~AO PAULO}
+
+\titulo{An\'alise Preditiva de Churn de Clientes utilizando Machine Learning}
+\titleabstract{Predictive Analysis of Customer Churn using Machine Learning}
+\tituloadic{Predictive Analysis of Customer Churn using Machine Learning}
+\tituloresumo{An\'alise Preditiva de Churn de Clientes utilizando Machine Learning}
+
+\autor{Fabiano Rodrigues Ugulino}
+\autorficha{Ugulino, Fabiano}
+\autorabr{UGULINO, F.}
+
+% O codigo Cutter definitivo e atribuido pela Biblioteca Prof. Achille Bassi.
+% Enquanto nao houver o definitivo, o campo fica em branco (linha ativa abaixo).
+\cutter{ }
+%\cutter{U26a}
+
+\local{S\~ao Carlos}
+\data{2026}
+
+\renewcommand{\orientadorname}{Orientadora:}
+\orientador{Profa. Dra. Cibele M. Russo}
+\orientadoradic{Advisor: Profa. Dra. Cibele M. Russo}
+\orientadorcorpoficha{orientadora Cibele M. Russo}
+\orientadorficha{Russo, Cibele M., orient}
+
+\notaautorizacao{AUTORIZO A REPRODU\c{C}\~AO E DIVULGA\c{C}\~AO TOTAL OU PARCIAL DESTE TRABALHO, POR QUALQUER MEIO CONVENCIONAL OU ELETR\^ONICO PARA FINS DE ESTUDO E PESQUISA, DESDE QUE CITADA A FONTE.}
+
+\notabib{Ficha catalogr\'afica elaborada pela Biblioteca Prof. Achille Bassi, ICMC/USP, com os dados fornecidos pelo(a) autor(a)}
+
+\newcommand{\programa}[1]{
+% MBAIAp ==========================================================================
+\ifthenelse{\equal{#1}{MBAIAp}}{
+	\tipotrabalho{Monografia (MBA em Intelig\^encia Artificial e Big Data)}
+	\tipotrabalhoabs{Monograph (MBA in Artificial Intelligence and Big Data)}
+	\area{Intelig\^encia Artificial}
+	\areaadic{Concentration area: Artificial Intelligence}
+	\preambulo{Monografia apresentada ao Departamento de Ci\^encias de Computa\c{c}\~ao do Instituto de Ci\^encias Matem\'aticas e de Computa\c{c}\~ao, Universidade de S\~ao Paulo - ICMC/USP, como parte dos requisitos para obten\c{c}\~ao do t\'itulo de Especialista em Intelig\^encia Artificial e Big Data.}
+	\preambuloadic{Monograph presented to the Departamento de Ci\^encias de Computa\c{c}\~ao do Instituto de Ci\^encias Matem\'aticas e de Computa\c{c}\~ao, Universidade de S\~ao Paulo - ICMC/USP, as part of the requirements for obtaining the title of Specialist in Artificial Intelligence and Big Data.}
+	\notaficha{Monografia (MBA em Intelig\^encia Artificial e Big Data)}
+	\notacapaicmc{Monografia - MBA em Intelig\^encia Artificial e Big Data}
+    }{
+% MBAIAe ==========================================================================
+\ifthenelse{\equal{#1}{MBAIAe}}{
+	\tipotrabalho{Monografia (MBA em Intelig\^encia Artificial e Big Data)}
+	\tipotrabalhoabs{Monograph (MBA in Artificial Intelligence and Big Data)}
+	\renewcommand{\areaname}{Concentration area:}
+	\area{Artificial Intelligence and Big Data}
+	\areaadic{\'Area de concentra\c{c}\~ao: Intelig\^encia Artificial e Big Data}
+	\preambulo{Monograph presented to the Departamento de Ci\^encias de Computa\c{c}\~ao do Instituto de Ci\^encias Matem\'aticas e de Computa\c{c}\~ao, Universidade de S\~ao Paulo - ICMC/USP, as part of the requirements for obtaining the title of Specialist in Artificial Intelligence and Big Data.}
+	\preambuloadic{Monografia apresentada ao Departamento de Ci\^encias de Computa\c{c}\~ao do Instituto de Ci\^encias Matem\'aticas e de Computa\c{c}\~ao, Universidade de S\~ao Paulo - ICMC/USP, como parte dos requisitos para obten\c{c}\~ao do t\'itulo de Especialista em Intelig\^encia Artificial e Big Data.}
+	\notaficha{Monograph (MBA in Artificial Intelligence and Big Data)}
+	\notacapaicmc{Monograph - MBA in Artificial Intelligence and Big Data}
+    }{
+% Outros ==========================================================================
+	\tipotrabalho{Monografia (MBA)}
+	\tipotrabalhoabs{Monograph (MBA)}
+	\area{Nome da \'Area}
+	\areaadic{Additional area}
+	\preambulo{Monografia apresentada ao Instituto de Ci\^encias Matem\'aticas e de Computa\c{c}\~ao, Universidade de S\~ao Paulo - ICMC/USP, como parte dos requisitos para obten\c{c}\~ao do t\'itulo de Especialista.}
+	\preambuloadic{Monograph presented to the Instituto de Ci\^encias Matem\'aticas e de Computa\c{c}\~ao, Universidade de S\~ao Paulo - ICMC/USP, as part of the requirements for obtaining the title of Specialist.}
+	\notaficha{Monografia (MBA)}
+	\notacapaicmc{Monografia - MBA}
+        }}
+}

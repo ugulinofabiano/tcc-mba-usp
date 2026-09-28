@@ -1,0 +1,50 @@
+\chapter{Introdução} \label{Cap:Introducao}
+
+\FloatBarrier
+\section{Contexto} \label{sec:contexto}
+
+A aceleração da transformação digital nas últimas décadas modificou estruturalmente os padrões de consumo, consolidando o comércio eletrônico como canal de crescente relevância em diversos setores da economia global. Esse fenômeno, caracterizado pela migração de transações dos ambientes físicos para plataformas digitais, ampliou significativamente tanto a oferta de produtos e serviços quanto o poder de escolha dos consumidores. Em consequência, intensificou-se a competição entre organizações, que passaram a disputar clientes em mercados marcados pela elevada transparência de preços, facilidade de comparação e baixo custo de migração entre concorrentes \cite{turban2018}.
+
+Nesse contexto, a retenção de clientes emergiu como fator crítico de vantagem competitiva, uma vez que o customer churn, definido como o abandono ou interrupção do relacionamento comercial por parte do cliente, representa um dos principais riscos à sustentabilidade financeira dos negócios digitais. Estudos indicam que tanto as taxas quanto os próprios critérios de classificação de churn variam consideravelmente entre setores \cite{imani2025}, e que a aquisição de clientes no comércio eletrônico é particularmente custosa, tornando muitas relações não lucrativas em seus primeiros anos e conferindo à retenção papel central na geração de resultados \cite{reichheld2000}.
+
+Apesar da relevância do tema, observa-se a presumível dominância de abordagens reativas na gestão do churn em organizações de e-commerce, nas quais as ações de retenção são implementadas apenas após a perda efetiva do cliente, comprometendo a eficácia e o custo-benefício das estratégias organizacionais \cite{hadden2007,matuszelanski2022}. A incapacidade de identificar, de forma antecipada, os clientes com maior propensão ao abandono resulta em perdas financeiras evitáveis e na subutilização de recursos destinados às iniciativas de marketing e relacionamento \cite{neslin2006}.
+
+Diante desse cenário, técnicas de Machine Learning têm se consolidado como abordagens eficazes para a construção de modelos preditivos de churn, permitindo identificar padrões complexos e não lineares em grandes volumes de dados históricos e comportamentais \cite{imani2025}. A aplicação dessas técnicas viabiliza a transição de uma postura reativa para um modelo proativo de gestão do relacionamento com o cliente, no qual ações de retenção são direcionadas com maior precisão, fundamentadas em evidências quantitativas extraídas dos próprios dados transacionais da organização \cite{manzoor2024}.
+
+Adicionalmente, a incorporação de técnicas de Inteligência Artificial Explicável (XAI), como os valores SHAP (SHapley Additive exPlanations), contribui para a explicabilidade das predições de modelos preditivos \cite{lundberg2017}, ampliando a interpretabilidade dos fatores determinantes do abandono e fornecendo subsídios para melhorias estruturais em produtos, serviços e processos organizacionais. A explicabilidade torna-se especialmente relevante em contextos de negócio, onde decisões baseadas em modelos precisam ser justificadas e comunicadas a gestores e equipes operacionais.
+
+\FloatBarrier
+\section{Problema de Pesquisa} \label{sec:problema}
+
+O problema central deste trabalho pode ser formulado da seguinte maneira: como é possível identificar, de forma antecipada e com base em dados históricos de transações de e-commerce, quais clientes apresentam maior propensão ao churn, possibilitando a adoção de estratégias proativas de retenção?
+
+Para o estudo empírico, utiliza-se o dataset Olist Brazilian E-Commerce Public Dataset \cite{olist2018}, disponível na plataforma Kaggle e já consolidado como base de referência em estudos de churn no e-commerce brasileiro \cite{matuszelanski2022}. O dataset contém dados reais de transações de um marketplace brasileiro, com aproximadamente 100.000 pedidos realizados entre 2016 e 2018, contemplando informações de pedidos, clientes, itens, pagamentos, avaliações e produtos, características que o tornam um ambiente propício para a aplicação de técnicas de análise preditiva com rigor metodológico.
+
+\FloatBarrier
+\section{Justificativa e Motivação} \label{sec:justificativa}
+
+A relevância deste trabalho fundamenta-se em três dimensões complementares. Do ponto de vista econômico, a previsão antecipada do churn permite às organizações alocar recursos de retenção com maior eficiência, concentrando esforços nos clientes com maior risco de abandono e maior valor estratégico para o negócio. Considerando o diferencial de custo entre retenção e aquisição de clientes \cite{reichheld2000}, o impacto financeiro de modelos preditivos bem calibrados é substancial.
+
+Do ponto de vista metodológico, o problema apresenta desafios técnicos relevantes, especialmente quanto ao tratamento do desbalanceamento de classes (no contexto do e-commerce, a maioria dos clientes realiza apenas uma compra) e quanto à necessidade de construção de janelas temporais que evitem vazamento de informação (data leakage) entre os períodos de observação e predição \cite{kaufman2012}. A adequação rigorosa dessas etapas é determinante para a validade externa dos modelos construídos.
+
+Do ponto de vista científico, o trabalho contribui para o campo da análise preditiva aplicada ao varejo digital, ao comparar sistematicamente dez algoritmos de Machine Learning, incorporar análise de explicabilidade via importância de features e valores SHAP, e adotar um protocolo de avaliação multi-métrica que vai além do ROC-AUC isolado, abordagem recomendada por De la Cruz Huayanay, Bazán e Russo (\citeyear{delacruz2025}) para cenários de dados desbalanceados. Essas dimensões permanecem ainda subexploradas em estudos aplicados ao contexto brasileiro de e-commerce \cite{matuszelanski2022}.
+
+\FloatBarrier
+\section{Objetivo Geral} \label{sec:objetivo-geral}
+
+Desenvolver e avaliar modelos preditivos de customer churn para o contexto de e-commerce, utilizando técnicas de Machine Learning aplicadas ao dataset Olist, com vistas a subsidiar estratégias proativas de retenção de clientes.
+
+Cabe destacar que predição de churn e gestão da retenção são duas faces do mesmo problema: o mesmo modelo que estima a probabilidade de abandono fornece, por complementaridade, o perfil dos clientes que tendem a retornar. Por essa razão, embora a variável-alvo seja formalmente definida como churn, a análise de explicabilidade (Seção \ref{sec:interpretabilidade}, em especial \ref{subsec:perfil-retorna}) e as recomendações de negócio (Seção \ref{sec:segmentacao}) são conduzidas sob a ótica da retenção, buscando responder não apenas ``quem abandona'', mas sobretudo ``qual o perfil do cliente que volta a comprar'', perspectiva de maior valor acionável para a organização.
+
+\FloatBarrier
+\section{Objetivos Específicos} \label{sec:objetivos-especificos}
+
+\begin{enumerate}
+	\item Construir um pipeline de engenharia de features baseado na metodologia RFM (Recência, Frequência e Monetário), adotando estratégia de janela temporal dupla para eliminação de vazamento de informação (data leakage) entre os períodos de observação e predição, a partir dos dados transacionais do dataset Olist.
+	\item Comparar o desempenho de dez algoritmos de Machine Learning (Regressão Logística, Árvore de Decisão, Random Forest, Extra Trees, Gradient Boosting, HistGradient Boosting, AdaBoost, K-Nearest Neighbors, Naive Bayes e SVM) por meio de um protocolo de avaliação multi-métrica adequado ao contexto de classes desbalanceadas, a saber, ROC-AUC, G-Mean, MCC, Kappa de Cohen, F1-Macro e Precision-Recall.
+	\item Implementar e avaliar técnicas de balanceamento de classes, combinando undersampling da classe majoritária e oversampling sintético da classe minoritária, e validar empiricamente a representatividade do subconjunto resultante via PSI e KS-test.
+	\item Analisar a importância das features do modelo de melhor desempenho via impureza de Gini e valores SHAP, identificando as variáveis mais determinantes para a predição do churn e seus efeitos direcionais sobre as predições. \label{obj:importancia}
+	\item Caracterizar, sob a ótica da retenção, o perfil comportamental dos clientes que retornam à plataforma, identificando os fatores associados à recompra (como diversidade de categorias e frequência de compras) que possam fundamentar estratégias proativas de fidelização.
+\end{enumerate}
+
+\FloatBarrier

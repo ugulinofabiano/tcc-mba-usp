@@ -1,0 +1,19 @@
+%% USPSC-Abstract.tex
+\begin{resumo}[Abstract]
+ \begin{otherlanguage*}{english}
+	\begin{flushleft}
+		\setlength{\absparsep}{0pt}
+		\SingleSpacing
+		\imprimirautorabr~~\textbf{\imprimirtitleabstract}.	\imprimirdata.  \pageref{LastPage} p.
+		\imprimirtipotrabalhoabs~-~\imprimirinstituicao, \imprimirlocal,	\imprimirdata.
+	\end{flushleft}
+	\OnehalfSpacing
+
+   Customer retention is a critical factor for the financial sustainability of e-commerce organizations, since the cost of acquiring new customers substantially exceeds that of retaining existing ones. The ability to anticipate which customers are most likely to abandon the platform (churn) becomes decisive for adopting proactive relationship strategies. The objective of this work is to identify and characterize, in advance and from historical transaction data, the profile of the customers at greatest risk of abandonment and that of those who return to the platform. A complete predictive analysis pipeline is proposed and applied to a public Brazilian e-commerce dataset (Olist), grounded in the engineering of behavioral features and in a temporal windowing strategy that prevents data leakage between the observation and prediction periods. The study systematically compares different machine learning algorithms, adopts techniques to handle the marked class imbalance, and employs an evaluation protocol with multiple metrics suitable for imbalanced contexts, complemented by explainability analysis (XAI). The main results show that ensemble tree-based models achieve, from simple behavioral features, the best discriminative performance among the algorithms evaluated (ROC-AUC of 0.81 on the test set, with a mean of 0.67 across thirty independent partitions), and that the diversity of purchase categories ranks among the factors most associated with retention, remaining among the three leading predictors in 29 out of thirty partitions, a finding with direct implications for loyalty strategies. The choice of the production model is supported by the quality of the risk ranking of customers, verified at fixed coverage against the two competing models with the best performance under binary decision metrics. The work further contributes with the empirical validation of the methodological decisions adopted throughout the pipeline.
+
+   \vspace{\onelineskip}
+
+   \noindent
+   \textbf{Keywords}: churn; machine learning; customer retention; RFM; e-commerce; explainability.
+ \end{otherlanguage*}
+\end{resumo}
