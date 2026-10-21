@@ -15,7 +15,7 @@ A Figura \ref{fig:eda-recencia} evidencia a concentração dos clientes Ativos e
 \caption{Análise exploratória de recência}
 \label{fig:eda-recencia}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig03-eda-recencia.png}
+	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig03-eda-recencia}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -28,7 +28,7 @@ A Figura \ref{fig:eda-recencia} evidencia a concentração dos clientes Ativos e
 \caption{Análise exploratória de frequência}
 \label{fig:eda-frequencia}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig04-eda-frequencia.png}
+	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig04-eda-frequencia}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -41,7 +41,7 @@ A Figura \ref{fig:eda-recencia} evidencia a concentração dos clientes Ativos e
 \caption{Análise exploratória de review score}
 \label{fig:eda-review}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig05-eda-review-score.png}
+	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig05-eda-review-score}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -54,7 +54,7 @@ A Figura \ref{fig:eda-recencia} evidencia a concentração dos clientes Ativos e
 \caption{Proporção Churn versus Ativo}
 \label{fig:proporcao-classes}
 \begin{center}
-	\includegraphics[width=0.7\textwidth]{USPSC-img/figuras/fig06-proporcao-churn-ativo.png}
+	\includegraphics[width=0.7\textwidth]{USPSC-img/figuras/fig06-proporcao-churn-ativo}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -62,6 +62,71 @@ A Figura \ref{fig:eda-recencia} evidencia a concentração dos clientes Ativos e
 	Fonte: elaborado pelo autor.
 \end{flushleft}
 \end{figure}
+
+\FloatBarrier
+\section{Comparação Empírica de Estratégias de Balanceamento} \label{sec:comparacao-balanceamento}
+
+A estratégia de reamostragem adotada, descrita na Seção \ref{sec:target-balanceamento}, foi submetida a comparação empírica com as três alternativas consideradas, sob o protocolo de avaliação da Seção \ref{sec:protocolo}. As Tabelas \ref{tab:comparacao-balanceamento} e \ref{tab:robustez-balanceamento} sintetizam os resultados.
+
+\begin{table}[htbp]
+\ABNTEXfontereduzida
+\SingleSpacing
+\caption{Comparação empírica de estratégias de balanceamento (split de referência)}
+\label{tab:comparacao-balanceamento}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.0cm}rrrrrrrrr@{}}
+\hline
+\textbf{Estratégia} & \shortstack[r]{\textbf{N}\\\textbf{treino}} & \shortstack[r]{\textbf{ROC-}\\\textbf{AUC}} & \shortstack[r]{\textbf{CV-}\\\textbf{AUC}} & \textbf{MCC} & \textbf{Kappa} & \shortstack[r]{\textbf{F1-}\\\textbf{Macro}} & \shortstack[r]{\textbf{Rec.}\\\textbf{Ativo}} & \shortstack[r]{\textbf{Rec.}\\\textbf{Churn}} & \textbf{Limiar} \\
+\hline
+Sem balanceamento & 942 & 0,8018 & 0,6017 & 0,2983 & 0,2680 & 0,6319 & 0,20 & 0,9912 & 0,75 \\
+Undersampling puro (1:1) & 80 & 0,7451 & 0,6080 & 0,1943 & 0,1884 & 0,5930 & 0,30 & 0,9425 & 0,27 \\
+SMOTE & 1.804 & 0,7327 & 0,5928 & 0,1253 & 0,1233 & 0,5610 & 0,20 & 0,9469 & 0,44 \\
+\textbf{Under 3:1 + gaussiano (adotada)} & \textbf{240} & \textbf{0,8106} & \textbf{0,6814} & \textbf{0,1931} & \textbf{0,1918} & \textbf{0,5957} & \textbf{0,20} & \textbf{0,9735} & \textbf{0,38} \\
+\hline
+\end{tabular}
+\begin{flushleft}
+	\ABNTEXfontereduzida
+	\SingleSpacing
+	Fonte: elaborado pelo autor.
+
+	\textit{Nota: modelo de referência Random Forest (n\_estimators = 300, max\_depth = 10), mantido fixo nas quatro estratégias; o que se compara aqui são estratégias de reamostragem, não algoritmos. A reamostragem é aplicada dentro de cada partição da validação cruzada, e o limiar de classificação é derivado das probabilidades out-of-fold do conjunto de treino, conforme o protocolo descrito na Seção \ref{sec:protocolo}. Como o limiar é derivado independentemente em cada estratégia, as métricas dependentes de limiar (MCC, Kappa, F1-Macro e os recalls) são calculadas em pontos de corte distintos e não constituem comparação direta entre estratégias; a comparação estritamente pareada é a das colunas ROC-AUC e CV-AUC.}
+\end{flushleft}
+\end{table}
+
+\begin{table}[htbp]
+\ABNTEXfontereduzida
+\SingleSpacing
+\caption{Robustez das estratégias de balanceamento em trinta divisões estratificadas}
+\label{tab:robustez-balanceamento}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.0cm}rrrr@{}}
+\hline
+\textbf{Estratégia} & \shortstack[r]{\textbf{ROC-AUC}\\\textbf{média}} & \shortstack[r]{\textbf{MCC}\\\textbf{médio}} & \shortstack[r]{\textbf{Kappa}\\\textbf{médio}} & \shortstack[r]{\textbf{Amplitude da}\\\textbf{ROC-AUC}} \\
+\hline
+Sem balanceamento & 0,6543 $\pm$ 0,0778 & 0,1168 $\pm$ 0,1167 & 0,1031 $\pm$ 0,1004 & 0,462 - 0,800 \\
+Undersampling puro (1:1) & 0,6510 $\pm$ 0,0769 & 0,0439 $\pm$ 0,0765 & 0,0392 $\pm$ 0,0689 & 0,501 - 0,802 \\
+SMOTE & 0,6615 $\pm$ 0,0660 & 0,1060 $\pm$ 0,0761 & 0,0895 $\pm$ 0,0696 & 0,539 - 0,810 \\
+\textbf{Under 3:1 + gaussiano (adotada)} & \textbf{0,6686 $\pm$ 0,0831} & \textbf{0,1140 $\pm$ 0,0804} & \textbf{0,1053 $\pm$ 0,0726} & \textbf{0,500 - 0,822} \\
+\hline
+\end{tabular}
+\begin{flushleft}
+	\ABNTEXfontereduzida
+	\SingleSpacing
+	Fonte: elaborado pelo autor.
+
+	\textit{Nota: aplica-se aqui a mesma observação da Tabela \ref{tab:comparacao-balanceamento} quanto ao modelo de referência e ao protocolo de avaliação. As trinta divisões são sorteios aleatórios estratificados do mesmo conjunto de clientes e do mesmo período, variando apenas a semente de particionamento; medem, portanto, a sensibilidade dos resultados ao particionamento dos dados, e não a generalização para períodos futuros, que demandaria validação respeitando a ordem cronológica.}
+\end{flushleft}
+\end{table}
+
+A comparação empírica das quatro estratégias, conduzida no notebook que acompanha esta monografia e sintetizada nas Tabelas \ref{tab:comparacao-balanceamento} e \ref{tab:robustez-balanceamento}, corrobora a escolha adotada, e o faz sob três evidências de naturezas distintas. Na validação cruzada conduzida exclusivamente sobre o conjunto de treino, critério que não depende do hold-out, a estratégia adotada obteve a maior CV-AUC (0,6814), à frente do undersampling puro (0,6080), da ausência de balanceamento (0,6017) e do SMOTE (0,5928). Para verificar se esse resultado não decorria de uma partição favorável, o experimento foi repetido em trinta divisões estratificadas independentes, nas quais a estratégia adotada manteve a maior ROC-AUC média (0,669), seguida pelo SMOTE (0,662), pela ausência de balanceamento (0,654) e pelo undersampling puro (0,651). No split de referência, a mesma combinação apresenta a maior ROC-AUC (0,811), à frente da ausência de balanceamento (0,802), do undersampling puro (0,745) e do SMOTE (0,733), evidência que se reporta como descritiva, uma vez que medida sobre o conjunto de teste.
+
+O desempenho inferior do undersampling puro é consistente com a redução drástica do conjunto de treino que a estratégia impõe: com apenas 40 clientes Ativos no treino, o balanceamento 1:1 produz 80 amostras, base insuficiente para algoritmos ensemble. O SMOTE \cite{chawla2002}, por sua vez, interpola entre vizinhos reais, procedimento que em conjuntos pequenos e esparsos tende a gerar instâncias em regiões pouco representativas do espaço de features. A ausência de balanceamento, embora competitiva em ROC-AUC, preserva o viés estrutural para a classe majoritária que a literatura documenta em cenários de desbalanceamento extremo \cite{he2009}.
+
+Cabe registrar duas ressalvas. A primeira é que, segundo o Coeficiente de Correlação de Matthews, uma das três métricas recomendadas por De la Cruz Huayanay, Bazán e Russo (\citeyear{delacruz2025}), a ausência de balanceamento supera a estratégia adotada no split de referência (0,2983 contra 0,1931, Tabela \ref{tab:comparacao-balanceamento}). O mesmo se verifica no Kappa de Cohen (0,2680 contra 0,1918) e no F1-Macro (0,6319 contra 0,5957), ambos igualmente favoráveis à ausência de balanceamento nesse split. Cabe observar, contudo, que essa vantagem não se traduz em ganho na classe minoritária: ambas as estratégias identificam corretamente a mesma proporção de clientes Ativos (Recall-Ativo de 0,20), e a diferença de MCC decorre exclusivamente do desempenho na classe majoritária (Recall-Churn de 0,9912 contra 0,9735). Na média das trinta divisões independentes, a diferença praticamente desaparece (MCC de 0,1140 para a estratégia adotada contra 0,1168 para a ausência de balanceamento, com desvios-padrão de 0,0804 e 0,1167), e a estratégia adotada apresenta o maior Kappa médio do conjunto (0,1053). A segunda ressalva é que as diferenças entre as estratégias situam-se dentro de um desvio-padrão, de modo que os resultados indicam tendência, e não superioridade estatisticamente estabelecida. A amplitude da ROC-AUC entre divisões, de 0,500 a 0,822 para a estratégia adotada, decorre do tamanho reduzido da classe Ativo no conjunto de teste (aproximadamente dez instâncias), limitação inerente ao problema e discutida ao longo deste trabalho. Reconhece-se, por fim, que o oversampling por ruído amplia a classe minoritária a partir de uma base amostral reduzida, o que motiva a análise de representatividade conduzida na Seção \ref{sec:representatividade}.
 
 \FloatBarrier
 \section{Benchmark Comparativo de Algoritmos} \label{sec:benchmark}
@@ -75,21 +140,21 @@ A Tabela \ref{tab:benchmark} apresenta os resultados consolidados dos dez algori
 \label{tab:benchmark}
 \centering
 \scriptsize
-\setlength{\tabcolsep}{2.2pt}
+\setlength{\tabcolsep}{1.3pt}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.3cm}rrrrrrrrrrrr@{}}
 \hline
 \textbf{Modelo} & \textbf{AUC} & \textbf{AP} & \shortstack[r]{\textbf{CV-}\\\textbf{AUC}} & \textbf{$\Delta$} & \shortstack[r]{\textbf{F1-}\\\textbf{Macro}} & \textbf{MCC} & \shortstack[r]{\textbf{G-}\\\textbf{Mean}} & \textbf{Kappa} & \shortstack[r]{\textbf{Prec.}\\\textbf{Ativo}} & \shortstack[r]{\textbf{Rec.}\\\textbf{Ativo}} & \shortstack[r]{\textbf{Rec.}\\\textbf{Churn}} & \textbf{Limiar} \\
 \hline
-Random Forest & 0,8106 & 0,9905 & 0,6814 & 0,1293 & 0,5957 & 0,1931 & 0,4412 & 0,1918 & 0,2500 & 0,20 & 0,9735 & 0,38 \\
-HistGradient Boosting & 0,7615 & 0,9872 & 0,7363 & 0,0252 & 0,6049 & 0,2143 & 0,5342 & 0,2110 & 0,2143 & 0,30 & 0,9513 & 0,18 \\
-Extra Trees & 0,7491 & 0,9860 & 0,6777 & 0,0714 & 0,5649 & 0,1639 & 0,3148 & 0,1370 & 0,3333 & 0,10 & 0,9912 & 0,34 \\
-Regressão Logística & 0,7075 & 0,9838 & 0,6326 & 0,0749 & 0,6440 & 0,3517 & 0,4462 & 0,2939 & 0,6667 & 0,20 & 0,9956 & 0,12 \\
-SVM & 0,7035 & 0,9833 & 0,6238 & 0,0798 & 0,4920 & 0,0250 & 0,4111 & 0,0197 & 0,0541 & 0,20 & 0,8451 & 0,37 \\
-Gradient Boosting & 0,6642 & 0,9796 & 0,6695 & 0,0053 & 0,5339 & 0,0679 & 0,3106 & 0,0678 & 0,1111 & 0,10 & 0,9646 & 0,08 \\
-Naive Bayes & 0,6405 & 0,9552 & 0,6390 & 0,0015 & 0,5887 & 0,1778 & 0,4402 & 0,1775 & 0,2222 & 0,20 & 0,9690 & 0,01 \\
-AdaBoost & 0,5544 & 0,9694 & 0,5372 & 0,0172 & 0,5725 & 0,2100 & 0,3155 & 0,1547 & 0,5000 & 0,10 & 0,9956 & 0,47 \\
-KNN & 0,5336 & 0,9596 & 0,5913 & 0,0577 & 0,5143 & 0,0314 & 0,3063 & 0,0307 & 0,0667 & 0,10 & 0,9381 & 0,09 \\
-Árvore de Decisão & 0,4772 & 0,9559 & 0,6119 & 0,1347 & 0,4592 & 0,0178 & 0,4708 & 0,0112 & 0,0484 & 0,30 & 0,7389 & 0,61 \\
+Random Forest & \textbf{0,8106} & \textbf{0,9905} & 0,6814 & $-$\,0,1293 & 0,5957 & 0,1931 & 0,4412 & 0,1918 & 0,2500 & 0,20 & 0,9735 & 0,38 \\
+HistGradient Boosting & 0,7615 & 0,9872 & \textbf{0,7363} & $-$\,0,0252 & 0,6049 & 0,2143 & \textbf{0,5342} & 0,2110 & 0,2143 & \textbf{0,30} & 0,9513 & 0,18 \\
+Extra Trees & 0,7491 & 0,9860 & 0,6777 & $-$\,0,0714 & 0,5649 & 0,1639 & 0,3148 & 0,1370 & 0,3333 & 0,10 & 0,9912 & 0,34 \\
+Regressão Logística & 0,7075 & 0,9838 & 0,6326 & $-$\,0,0749 & \textbf{0,6440} & \textbf{0,3517} & 0,4462 & \textbf{0,2939} & \textbf{0,6667} & 0,20 & \textbf{0,9956} & 0,12 \\
+SVM & 0,7035 & 0,9833 & 0,6238 & $-$\,0,0798 & 0,4920 & 0,0250 & 0,4111 & 0,0197 & 0,0541 & 0,20 & 0,8451 & 0,37 \\
+Gradient Boosting & 0,6642 & 0,9796 & 0,6695 & $+$\,0,0053 & 0,5339 & 0,0679 & 0,3106 & 0,0678 & 0,1111 & 0,10 & 0,9646 & 0,08 \\
+Naive Bayes & 0,6405 & 0,9552 & 0,6390 & $-$\,0,0015 & 0,5887 & 0,1778 & 0,4402 & 0,1775 & 0,2222 & 0,20 & 0,9690 & 0,01 \\
+AdaBoost & 0,5544 & 0,9694 & 0,5372 & $-$\,0,0172 & 0,5725 & 0,2100 & 0,3155 & 0,1547 & 0,5000 & 0,10 & \textbf{0,9956} & 0,47 \\
+KNN & 0,5336 & 0,9596 & 0,5913 & $+$\,0,0577 & 0,5143 & 0,0314 & 0,3063 & 0,0307 & 0,0667 & 0,10 & 0,9381 & 0,09 \\
+Árvore de Decisão & 0,4772 & 0,9559 & 0,6119 & $+$\,0,1347 & 0,4592 & 0,0178 & 0,4708 & 0,0112 & 0,0484 & \textbf{0,30} & 0,7389 & 0,61 \\
 \hline
 \end{tabular}
 \begin{flushleft}
@@ -97,13 +162,17 @@ KNN & 0,5336 & 0,9596 & 0,5913 & 0,0577 & 0,5143 & 0,0314 & 0,3063 & 0,0307 & 0,
 	\SingleSpacing
 	Fonte: elaborado pelo autor.
 
-	\textit{Nota: $\Delta$ é a diferença absoluta entre CV-AUC e AUC no hold-out. AP designa a Average Precision para a classe Churn, cuja linha de base no conjunto de teste é 0,958, valor correspondente à prevalência dessa classe; a informação relevante nessa coluna é a comparação entre modelos, e não a magnitude absoluta. Rec. Ativo corresponde à proporção das dez instâncias da classe Ativo do conjunto de teste corretamente identificadas. O limiar de cada modelo foi derivado das probabilidades out-of-fold do conjunto de treino, conforme a Seção \ref{sec:protocolo}, e todas as métricas dependentes de limiar foram calculadas nesse valor. Nenhum modelo foi descartado pelo critério de diferença entre validação cruzada e hold-out.}
+	\textit{Nota: $\Delta$ é a diferença com sinal entre CV-AUC e AUC no hold-out, isto é, $\Delta = \textrm{CV-AUC} - \textrm{AUC}$. Valores positivos indicam desempenho reamostrado superior ao observado fora da amostra, única direção compatível com otimismo do procedimento de validação; valores negativos indicam o oposto e não constituem evidência de sobreajuste. AP designa a Average Precision para a classe Churn, cuja linha de base no conjunto de teste é 0,958, valor correspondente à prevalência dessa classe; a informação relevante nessa coluna é a comparação entre modelos, e não a magnitude absoluta. Rec. Ativo corresponde à proporção das dez instâncias da classe Ativo do conjunto de teste corretamente identificadas. O limiar de cada modelo foi derivado das probabilidades out-of-fold do conjunto de treino, conforme a Seção \ref{sec:protocolo}, e todas as métricas dependentes de limiar foram calculadas nesse valor. Nenhum modelo foi descartado pelo critério de diferença entre validação cruzada e hold-out. O melhor valor de cada métrica aparece em negrito, com empates assinalados em todas as linhas correspondentes. Duas colunas não recebem destaque por não admitirem um ótimo: $\Delta$ é diagnóstico direcional, de modo que o valor mais próximo de zero não designa o melhor modelo, mas a maior concordância entre duas estimativas igualmente sujeitas a erro amostral; e o limiar é parâmetro da regra de decisão, derivado independentemente para cada algoritmo, e não medida de desempenho. Cabe ainda observar que valores elevados de Rec. Churn acompanhados de Rec. Ativo baixo refletem o viés para a classe majoritária descrito por \citeonline{he2009}, e não desempenho superior.}
 \end{flushleft}
 \end{table}
 
-A validação cruzada, conduzida com a reamostragem aplicada dentro de cada partição, não indicou sobreajuste em nenhum dos dez algoritmos: a maior diferença em relação ao hold-out foi de 0,1347 (Árvore de Decisão), seguida de 0,1293 (Random Forest), ambas abaixo do limite de 0,15 fixado na Seção \ref{sec:protocolo}. Registra-se a sensibilidade a esse parâmetro: sob um corte de 0,10, esses dois algoritmos seriam descartados, entre eles o adotado como modelo de produção; sob 0,20, o resultado seria idêntico ao obtido. Como nenhum modelo foi excluído pelo critério, ele não participou da escolha do modelo de produção, que se apoia nos fundamentos expostos adiante nesta seção. Esse resultado contrasta com o obtido na concepção inicial deste trabalho, em que a validação cruzada era conduzida sobre o conjunto de treino já balanceado. Naquele protocolo, instâncias sintéticas geradas por perturbação de uma mesma observação original distribuíam-se entre folds distintos, e o modelo avaliava, na partição de validação, quase duplicatas de exemplos vistos no ajuste. O efeito da correção é sistemático e ordena-se pela capacidade de memorização de cada algoritmo: a estimativa de validação cruzada caiu 0,3251 no AdaBoost, 0,3222 no KNN e 0,2657 no Extra Trees, contra apenas 0,0789 na Regressão Logística e 0,0634 no Naive Bayes, modelos paramétricos cuja estrutura não permite memorizar instâncias próximas. O caso do KNN é ilustrativo: sua estimativa de validação cruzada passou de 0,9135 para 0,5913, valor compatível com o desempenho de 0,5336 obtido no hold-out. Conclui-se que a diferença entre validação cruzada e hold-out observada na concepção inicial media vazamento de informação entre partições, e não sobreajuste ao conjunto de treino.
+A validação cruzada, conduzida com a reamostragem aplicada dentro de cada partição, não indicou sobreajuste em nenhum dos dez algoritmos. A leitura do $\Delta$ exige, contudo, atenção ao sinal. Apenas valores positivos, em que a estimativa reamostrada supera a observada fora da amostra, são compatíveis com o otimismo que caracteriza o sobreajuste ao procedimento de validação. Sob essa definição, somente três algoritmos apresentam $\Delta$ positivo, a saber, a Árvore de Decisão ($+$0,1347), o KNN ($+$0,0577) e o Gradient Boosting ($+$0,0053); nos sete restantes o desempenho no hold-out superou o da validação cruzada, situação que não configura sobreajuste. O Random Forest encontra-se entre estes últimos, com $\Delta$ de $-$0,1293, de modo que sua magnitude elevada decorre de desempenho no hold-out superior ao reamostrado, e não do contrário.
 
-Sob as três métricas recomendadas por De la Cruz Huayanay, Bazán e Russo (\citeyear{delacruz2025}), o modelo indicado seria o HistGradient Boosting: ele lidera o G-Mean (0,5342, o maior valor do conjunto) e ocupa a segunda posição em MCC (0,2143) e em Kappa de Cohen (0,2110). É também um dos dois algoritmos que identificam o maior número de clientes Ativos, três das dez instâncias do hold-out, empatado com a Árvore de Decisão mas com precisão muito superior (0,2143 contra 0,0484), e o que apresenta a menor diferença entre validação cruzada e hold-out entre os três modelos de melhor desempenho (0,0252), além da maior CV-AUC do conjunto (0,7363). A liderança isolada em MCC (0,3517) e Kappa (0,2939) cabe, contudo, à Regressão Logística, cuja vantagem não se sustenta na classe minoritária: o modelo identifica as mesmas duas instâncias Ativas que o Random Forest, e sua superioridade decorre integralmente da redução de falsos negativos, isto é, de clientes Churn incorretamente classificados como Ativos (um caso contra seis). Trata-se do mesmo padrão registrado na Seção \ref{sec:target-balanceamento} a respeito da ausência de balanceamento. O Random Forest, por sua vez, lidera a ROC-AUC (0,8106) e a Average Precision para a classe Churn (0,9905), as duas métricas do conjunto que independem do limiar de classificação e que medem, portanto, a qualidade da ordenação dos clientes por risco.
+Essa observação impõe uma segunda qualificação, relativa à magnitude. A classe Ativo dispõe de apenas dez instâncias no conjunto de teste, o que torna a ROC-AUC ali estimada sujeita a erro amostral substancial. Pela aproximação de \citeonline{hanley1982}, com dez observações de uma classe e 226 da outra, o erro padrão da ROC-AUC do Random Forest é de aproximadamente 0,084, de modo que o intervalo de confiança de 95\% para aquele valor abrange de 0,65 a 0,97, amplitude de 0,33. Diferenças entre CV-AUC e hold-out de magnitude inferior a essa amplitude são, portanto, compatíveis com variabilidade amostral entre partições, sem necessidade de recurso a qualquer hipótese sobre o ajuste do modelo. Os erros padrão dos demais algoritmos situam-se na mesma ordem de grandeza, entre 0,084 e 0,097, uma vez que dependem majoritariamente do tamanho da classe minoritária, comum a todos.
+
+Em consequência, o limite de 0,15 fixado na Seção \ref{sec:protocolo} é rebaixado à condição de diagnóstico descritivo, e não de critério de exclusão: sua função é sinalizar divergências que mereçam inspeção, não estabelecer um teste de sobreajuste, para o qual o regime amostral deste trabalho não oferece poder estatístico. Nenhum modelo foi excluído por esse critério, que, portanto, não participou da escolha do modelo adotado. Registra-se, ainda, que um corte simétrico de 0,10 sobre o valor absoluto descartaria a Árvore de Decisão e o Random Forest conjuntamente, embora seus $\Delta$ apontem em direções opostas, o que ilustra por que a formulação em valor absoluto, adotada na concepção inicial deste trabalho, é inadequada ao fim pretendido. Esse resultado contrasta com o obtido na concepção inicial deste trabalho, em que a validação cruzada era conduzida sobre o conjunto de treino já balanceado. Naquele protocolo, instâncias sintéticas geradas por perturbação de uma mesma observação original distribuíam-se entre folds distintos, e o modelo avaliava, na partição de validação, quase duplicatas de exemplos vistos no ajuste. O efeito da correção é sistemático e ordena-se pela capacidade de memorização de cada algoritmo: a estimativa de validação cruzada caiu 0,3251 no AdaBoost, 0,3222 no KNN e 0,2657 no Extra Trees, contra apenas 0,0789 na Regressão Logística e 0,0634 no Naive Bayes, modelos paramétricos cuja estrutura não permite memorizar instâncias próximas. O caso do KNN é ilustrativo: sua estimativa de validação cruzada passou de 0,9135 para 0,5913, valor compatível com o desempenho de 0,5336 obtido no hold-out. Conclui-se que a diferença entre validação cruzada e hold-out observada na concepção inicial media vazamento de informação entre partições, e não sobreajuste ao conjunto de treino.
+
+Sob as três métricas recomendadas por De la Cruz Huayanay, Bazán e Russo (\citeyear{delacruz2025}), o modelo indicado seria o HistGradient Boosting: ele lidera o G-Mean (0,5342, o maior valor do conjunto) e ocupa a segunda posição em MCC (0,2143) e em Kappa de Cohen (0,2110). É também um dos dois algoritmos que identificam o maior número de clientes Ativos, três das dez instâncias do hold-out, empatado com a Árvore de Decisão mas com precisão muito superior (0,2143 contra 0,0484), e o que apresenta a menor diferença entre validação cruzada e hold-out entre os três modelos de melhor desempenho (0,0252), além da maior CV-AUC do conjunto (0,7363). A liderança isolada em MCC (0,3517) e Kappa (0,2939) cabe, contudo, à Regressão Logística, cuja vantagem não se sustenta na classe minoritária: o modelo identifica as mesmas duas instâncias Ativas que o Random Forest, e sua superioridade decorre integralmente da redução de falsos negativos, isto é, de clientes Churn incorretamente classificados como Ativos (um caso contra seis). Trata-se do mesmo padrão registrado na Seção \ref{sec:comparacao-balanceamento} a respeito da ausência de balanceamento. O Random Forest, por sua vez, lidera a ROC-AUC (0,8106) e a Average Precision para a classe Churn (0,9905), as duas métricas do conjunto que independem do limiar de classificação e que medem, portanto, a qualidade da ordenação dos clientes por risco.
 
 Os valores absolutos de MCC e Kappa de Cohen, com máximos de 0,35 e 0,29 respectivamente entre os dez modelos, situam-se abaixo do limiar usualmente associado a concordância substancial \cite{landis1977}. É importante enfatizar que essa limitação decorre estruturalmente da composição do conjunto de teste: com apenas dez instâncias da classe Ativo em um hold-out de 236 clientes, no qual a proporção de 4,2\% da base foi preservada, qualquer erro de classificação na classe minoritária impacta desproporcionalmente o MCC e o Kappa, comportamento previsto analiticamente por \citeonline{luque2019} e coerente com a sensibilidade do MCC a todos os quadrantes da matriz de confusão, destacada por \citeonline{chicco2020}. A mesma escassez restringe o número de configurações possíveis da matriz de confusão: o Recall da classe Ativo assume apenas três valores distintos entre os dez algoritmos avaliados (0,10, 0,20 e 0,30), e nenhum modelo ultrapassa três acertos em dez. Não se trata de falha algorítmica, mas de consequência matemática do desbalanceamento extremo preservado no hold-out, escolha metodológica deliberada para preservar a validade da avaliação em condições reais de operação.
 
@@ -129,9 +198,9 @@ Os três modelos de melhor desempenho, Random Forest, HistGradient Boosting e Re
 \endfoot
 \hline
 \endlastfoot
-Random Forest (produção) &
+Random Forest (selecionado) &
 Maior ROC-AUC (0,8106) e maior Average Precision para a classe Churn (0,9905), as duas métricas que independem do limiar e medem a qualidade da ordenação dos clientes por risco; melhor captura de clientes Ativos em cobertura fixa, liderando ou empatando em todas as frações avaliadas entre 10\% e 60\% do conjunto de teste; alcança 90\% dos clientes Ativos abordando 35,6\% das observações, a menor cobertura entre os três modelos; retém nove dos dez clientes Ativos do conjunto de teste fora da faixa Crítico, em 39,0\% das observações, lift de 2,31 vezes; importância de features nativa via impureza de Gini, requisito do objetivo específico (\ref{obj:importancia}). &
-Menores MCC (0,1931), Kappa de Cohen (0,1918) e G-Mean (0,4412) entre os três modelos; identifica duas das dez instâncias Ativas do hold-out, contra três do HistGradient Boosting; menor Average Precision para a classe Ativo (0,1494, contra 0,2559 do HistGradient Boosting), métrica dominada pelo extremo inicial da ordenação; maior diferença entre validação cruzada e hold-out entre os três (0,1293); ROC-AUC média em validação cruzada de 0,6814, inferior aos 0,7363 do HistGradient Boosting; maior custo de memória em produção. \\
+Menores MCC (0,1931), Kappa de Cohen (0,1918) e G-Mean (0,4412) entre os três modelos; identifica duas das dez instâncias Ativas do hold-out, contra três do HistGradient Boosting; menor Average Precision para a classe Ativo (0,1494, contra 0,2559 do HistGradient Boosting), métrica dominada pelo extremo inicial da ordenação; maior distância em módulo entre validação cruzada e hold-out entre os três ($\Delta$ de $-$0,1293, negativo e, portanto, sem relação com sobreajuste); ROC-AUC média em validação cruzada de 0,6814, inferior aos 0,7363 do HistGradient Boosting; maior custo de memória em implantação. \\
 \hline
 HistGradient Boosting (alternativo) &
 Lidera o G-Mean (0,5342, o maior valor do conjunto de dez algoritmos); segundo maior MCC (0,2143) e Kappa de Cohen (0,2110); identifica três das dez instâncias Ativas do hold-out, o maior número entre os três modelos; maior Average Precision para a classe Ativo entre os três (0,2559), o que indica acerto no extremo inicial da ordenação; maior CV-AUC do conjunto (0,7363) e menor diferença em relação ao hold-out entre os três (0,0252); treino rápido em dados tabulares. &
@@ -145,11 +214,19 @@ Menor ROC-AUC entre os três (0,7075) e menor Average Precision para a classe Ch
 	\ABNTEXfontereduzida
 	\SingleSpacing
 	Fonte: elaborado pelo autor.
+
+	\textit{Nota: as grandezas deste quadro são medidas no conjunto de teste e destinam-se à caracterização do comportamento dos três modelos de melhor desempenho, não tendo fundamentado a escolha entre eles. A seleção foi conduzida sobre as probabilidades out-of-fold do conjunto de treino, conforme descrito a seguir e na Seção \ref{sec:protocolo}.}
 \end{flushleft}
 \addtocounter{table}{-1}
 \endgroup
 
-A seleção do modelo de produção seguiu dois critérios, ordenados pela natureza do entregável descrito na Seção \ref{sec:segmentacao}. O primeiro é a qualidade da ordenação dos clientes por risco. A estratificação em faixas não constitui uma decisão binária em um ponto de corte, mas uma priorização que depende da posição relativa de cada cliente na escala de scores; as métricas apropriadas a esse uso são, portanto, aquelas que independem do limiar, e o Random Forest lidera ambas (ROC-AUC de 0,8106 e Average Precision de 0,9905 para a classe Churn). Cabe registrar que a Average Precision da classe Churn parte de uma linha de base de 0,958, de modo que sua magnitude absoluta é pouco informativa e apenas a ordenação entre modelos o é. A evidência decisiva da qualidade da ordenação não é, por isso, nenhuma das duas métricas isoladamente, mas a curva de captura em cobertura fixa apresentada adiante nesta seção, que independe de linha de base e mede diretamente quantos clientes recuperáveis cada modelo entrega por unidade de esforço. Cabe explicitar que a vantagem do Random Forest reside na ordenação dos clientes, e não na dispersão de seus scores. A Figura \ref{fig:distribuicao-scores} evidencia que a Regressão Logística produz a distribuição mais uniforme entre as quatro faixas (5,8\%, 31,2\%, 33,4\% e 29,6\% na base completa, contra 2,3\%, 8,6\%, 31,0\% e 58,1\% do Random Forest), e ainda assim é a menos eficaz na identificação de clientes recuperáveis por unidade de cobertura. O segundo critério é, portanto, a eficiência do recorte resultante, verificada empiricamente no conjunto de teste e detalhada nos parágrafos seguintes. Registra-se explicitamente que, sob as três métricas recomendadas por De la Cruz Huayanay, Bazán e Russo (\citeyear{delacruz2025}), aplicáveis à avaliação de decisões binárias, o modelo de produção não seria o Random Forest, que ocupa a quarta posição em MCC e em G-Mean e a terceira em Kappa de Cohen. A escolha recairia sobre o HistGradient Boosting ou sobre a Regressão Logística, que empatam em posição média nos três rankings (1,67 cada), o primeiro por liderar o G-Mean e a segunda por liderar MCC e Kappa. Esse empate é ilustrativo: as métricas recomendadas apontam a inadequação do Random Forest para a decisão binária, mas não desempatam entre si, o que reforça que o critério de escolha precisa vir da natureza do entregável. A divergência entre os dois conjuntos de critérios não é resolvida por arbitragem entre métricas, mas pela definição do que o modelo entrega: adota-se o Random Forest porque o produto deste trabalho é uma priorização de risco, e o HistGradient Boosting permanece registrado como alternativa indicada caso o objetivo passe a ser a maximização da detecção da classe minoritária em regime de decisão binária.
+A seleção do modelo adotado foi conduzida em dois estágios e, em ambos, sem recurso ao conjunto de teste. O primeiro estágio é de elegibilidade e decorre do objetivo específico (\ref{obj:importancia}), declarado antes de qualquer experimento: a análise de importância de features do modelo escolhido apoia-se na impureza de Gini e na estabilidade dessa ordenação entre partições. Permanecem elegíveis, por conseguinte, apenas os estimadores que expõem medida nativa de importância por impureza, a saber, Random Forest, Extra Trees, Gradient Boosting, Árvore de Decisão e AdaBoost. O HistGradient Boosting não a expõe, tampouco a Regressão Logística, o SVM, o KNN e o Naive Bayes. Trata-se de restrição de escopo decorrente dos objetivos do trabalho, e não de juízo de desempenho.
+
+O segundo estágio ordena os modelos elegíveis segundo a natureza do entregável, e todas as grandezas nele empregadas foram estimadas sobre as probabilidades out-of-fold do conjunto de treino (n = 942, dos quais 40 clientes Ativos), as mesmas de que se deriva o limiar conforme a Seção \ref{sec:protocolo}. O primeiro aspecto é a qualidade da ordenação dos clientes por risco, uma vez que a estratificação em faixas não constitui decisão binária em um ponto de corte, mas priorização dependente da posição relativa de cada cliente na escala de scores. Sob esse aspecto, o Random Forest apresenta a maior área sob a curva ROC fora da amostra entre os elegíveis (0,6784, contra 0,6739 do Extra Trees, 0,6702 do Gradient Boosting, 0,6087 da Árvore de Decisão e 0,5347 do AdaBoost) e captura o maior número de clientes Ativos quando a cobertura é fixada em 30\% da base (23 dos 40, contra 21 do Gradient Boosting e 19 do Extra Trees). O segundo aspecto é a usabilidade da segmentação em faixas, que constitui o produto descrito na Seção \ref{sec:segmentacao}: aplicados às mesmas probabilidades out-of-fold os cortes da Tabela \ref{tab:segmentacao}, o Random Forest aloca 55,0\% dos clientes na faixa Crítico e retém 28 dos 40 Ativos fora dela, isto é, 70,0\% dos clientes recuperáveis, ao custo de 45,0\% de cobertura e com lift de 1,56. Entre os elegíveis, constitui o melhor compromisso: o Gradient Boosting alcança lift superior (2,03), mas concentra 81,5\% da base na faixa Crítico e retém apenas 15 dos 40 Ativos; o Extra Trees retém 31, porém exige 58,6\% de cobertura, com lift de 1,32; e o AdaBoost degenera, alocando 0,1\% na faixa Crítico e exigindo a abordagem de 99,9\% da base, com lift unitário.
+
+Registra-se explicitamente o que esses mesmos critérios indicariam na ausência da restrição de elegibilidade. O HistGradient Boosting apresenta a maior área sob a curva ROC fora da amostra entre os dez algoritmos avaliados (0,7323, contra 0,6784 do Random Forest) e captura mais clientes Ativos em cobertura fixa, de modo que sua exclusão decorre do requisito de interpretabilidade, e não de inferioridade na ordenação. Em contrapartida, a segmentação dele resultante é substancialmente menos utilizável: sobre as mesmas probabilidades out-of-fold, concentra 75,1\% dos clientes na faixa Crítico, contra 55,0\% do Random Forest, e retém 22 dos 40 Ativos fora dela, contra 28. Seu recorte é mais preciso por unidade de cobertura (lift de 2,20 contra 1,56), porém estreito: alcança 55,0\% dos clientes recuperáveis, ante 70,0\% do Random Forest. Essa concentração decorre da dispersão de seus scores, e não da ordenação que produz, e sua correção demandaria calibração prévia de probabilidades, registrada entre os trabalhos futuros. Cabe ainda registrar que, sob as três métricas recomendadas por De la Cruz Huayanay, Bazán e Russo (\citeyear{delacruz2025}), aplicáveis à avaliação de decisões binárias, o modelo adotado não seria o Random Forest, que ocupa a quarta posição em MCC e em G-Mean e a terceira em Kappa de Cohen; a escolha recairia sobre o HistGradient Boosting ou sobre a Regressão Logística, que empatam em posição média nos três rankings (1,67 cada). Esse empate é ilustrativo: as métricas recomendadas apontam a inadequação do Random Forest para a decisão binária, mas não desempatam entre si, o que reforça que o critério de escolha precisa vir da natureza do entregável.
+
+Concluída a seleção, o conjunto de teste foi empregado uma única vez, para a avaliação final do modelo adotado. Os valores de hold-out reportados na Tabela \ref{tab:benchmark} e nos parágrafos seguintes possuem, portanto, caráter de estimativa final e de caracterização comparativa do comportamento dos dez algoritmos, não tendo participado da decisão. Reconhece-se que as diferenças entre os modelos elegíveis situam-se dentro de um desvio-padrão da variabilidade entre partições documentada na Tabela \ref{tab:robustez-balanceamento}, de modo que a seleção indica tendência, e não superioridade estatisticamente estabelecida.
 
 Registra-se, ademais, uma limitação operacional do HistGradient Boosting relativa à distribuição de suas probabilidades preditas. Aplicado à base completa, esse modelo concentra os scores junto do extremo superior da escala (primeiro quartil de 0,7927, mediana de 0,9621 e terceiro quartil de 0,9915), enquanto o Random Forest mantém a distribuição centrada em valores intermediários da escala (primeiro quartil de 0,6545, mediana de 0,7781 e terceiro quartil de 0,8601) e a Regressão Logística, a mais dispersa das três (primeiro quartil de 0,4204, mediana de 0,6000 e terceiro quartil de 0,7818). Esse deslocamento das probabilidades para a classe majoritária do treino é coerente com o viés induzido pelo treinamento em conjunto artificialmente balanceado, formalizado por \citeonline{dalpozzolo2015}, e manifesta-se de forma mais acentuada no HistGradient Boosting do que nos demais, sem prejuízo da ordenação relativa dos clientes, o que explica a preservação de seu ROC-AUC. A consequência prática recai sobre a granularidade da segmentação de risco em faixas apresentada na Seção \ref{sec:segmentacao}. Aplicados os mesmos limiares da Tabela \ref{tab:segmentacao} à base completa, o HistGradient Boosting aloca 77,6\% dos clientes na faixa Crítico e distribui os demais em 9,6\% no Baixo, 5,6\% no Médio e 7,2\% no Alto, contra 58,1\%, 2,3\%, 8,6\% e 31,0\% do Random Forest e 29,6\%, 5,8\%, 31,2\% e 33,4\% da Regressão Logística, respectivamente. O mesmo padrão reproduz-se no conjunto de teste, o que afasta a hipótese de artefato das observações de treino: nele o HistGradient Boosting aloca 79,7\% dos clientes na faixa Crítico, restando 8,1\% no Baixo, 5,9\% no Médio e 6,4\% no Alto, enquanto o Random Forest aloca 61,0\% no Crítico, 30,9\% no Alto, 6,4\% no Médio e 1,7\% no Baixo, e a Regressão Logística, 33,1\%, 31,8\%, 30,1\% e 5,1\%. A escala do modelo alternativo comporta, portanto, essencialmente uma faixa útil, o que compromete a capacidade de priorizar clientes por grau de risco. Registra-se, contudo, que a dispersão da escala não é, isoladamente, critério de escolha: a Regressão Logística apresenta a distribuição mais uniforme dos três modelos e o pior desempenho na identificação de clientes recuperáveis por unidade de cobertura, conforme se demonstra a seguir.
 
@@ -177,13 +254,13 @@ Cabe dimensionar o efeito do procedimento de derivação do limiar. O valor de 0
 
 No limiar padrão de 0,50, 91,9\% dos clientes de teste são classificados como Churn, proporção inferior à real (95,8\%), o que indica que parte dos clientes que de fato não retornaram recebe probabilidade prevista abaixo de 0,50 e seria incorretamente classificada como Ativo. A redução do limiar para 0,38 atenua esse deslocamento, ampliando a cobertura da classe majoritária ao custo de maior número de falsos positivos, isto é, de clientes Ativos incorretamente classificados como Churn, trade-off dimensionado na Seção \ref{sec:benchmark}. Cabe registrar que o viés decorrente do balanceamento afeta as métricas dependentes de limiar, mas não a ordenação das probabilidades preditas \cite{dalpozzolo2015}, o que corrobora a adoção de métricas independentes de limiar como critério primário de seleção.
 
-As matrizes de confusão resultantes (Figuras \ref{fig:matrizes-a} e \ref{fig:matrizes-b}) confirmam a elevada capacidade de identificação da classe Churn, com Recall de 0,97 (220 das 226 instâncias), e evidenciam, ao mesmo tempo, a limitação imposta pela classe Ativo, representada por apenas dez instâncias no conjunto de teste, das quais duas são corretamente identificadas. O teto observado entre os dez algoritmos avaliados é de três acertos em dez (Tabela \ref{tab:benchmark}), obtido pelo HistGradient Boosting e pela Árvore de Decisão, o que situa o desempenho do modelo de produção próximo ao máximo alcançável neste regime amostral e reforça que a limitação é da base, e não do algoritmo.
+As matrizes de confusão resultantes (Figuras \ref{fig:matrizes-a} e \ref{fig:matrizes-b}) confirmam a elevada capacidade de identificação da classe Churn, com Recall de 0,97 (220 das 226 instâncias), e evidenciam, ao mesmo tempo, a limitação imposta pela classe Ativo, representada por apenas dez instâncias no conjunto de teste, das quais duas são corretamente identificadas. O teto observado entre os dez algoritmos avaliados é de três acertos em dez (Tabela \ref{tab:benchmark}), obtido pelo HistGradient Boosting e pela Árvore de Decisão, o que situa o desempenho do modelo adotado próximo ao máximo alcançável neste regime amostral e reforça que a limitação é da base, e não do algoritmo.
 
 \begin{figure}[htbp]
-\caption{Matrizes de confusão do Logistic Regression, Decision Tree, HistGradient Boosting, AdaBoost e KNN no conjunto de teste (limiar out-of-fold)}
+\caption{Matrizes de confusão do Logistic Regression, Decision Tree, Random Forest, Extra Trees e Gradient Boosting no conjunto de teste (limiar out-of-fold)}
 \label{fig:matrizes-a}
 \begin{center}
-	\includegraphics[width=0.95\textwidth]{USPSC-img/figuras/fig07-matrizes-confusao-a.png}
+	\includegraphics[width=0.95\textwidth]{USPSC-img/figuras/fig07-matrizes-confusao-a}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -193,10 +270,10 @@ As matrizes de confusão resultantes (Figuras \ref{fig:matrizes-a} e \ref{fig:ma
 \end{figure}
 
 \begin{figure}[htbp]
-\caption{Matrizes de confusão do Extra Trees, Gradient Boosting, Naive Bayes e SVM no conjunto de teste (limiar out-of-fold)}
+\caption{Matrizes de confusão do HistGradient Boosting, AdaBoost, KNN, Naive Bayes e SVM no conjunto de teste (limiar out-of-fold)}
 \label{fig:matrizes-b}
 \begin{center}
-	\includegraphics[width=0.95\textwidth]{USPSC-img/figuras/fig08-matrizes-confusao-b.png}
+	\includegraphics[width=0.95\textwidth]{USPSC-img/figuras/fig08-matrizes-confusao-b}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -211,7 +288,7 @@ A Curva Precision-Recall (Figura \ref{fig:curva-pr}) corrobora a qualidade predi
 \caption{Critério de escolha do ponto de corte em função do limiar (Random Forest)}
 \label{fig:limiar-corte}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig09-limiar-corte.png}
+	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig09-limiar-corte}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -224,7 +301,7 @@ A Curva Precision-Recall (Figura \ref{fig:curva-pr}) corrobora a qualidade predi
 \caption{Curva Precision-Recall por classe, independente do limiar (Random Forest)}
 \label{fig:curva-pr}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig10-curva-precision-recall.png}
+	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig10-curva-precision-recall}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -319,7 +396,7 @@ O resultado para n\_categories (número de categorias distintas adquiridas) mere
 \caption{Importância das features por impureza de Gini (Random Forest)}
 \label{fig:importancia-gini}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig11-importancia-gini.png}
+	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig11-importancia-gini}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -332,7 +409,7 @@ O resultado para n\_categories (número de categorias distintas adquiridas) mere
 \caption{Top-5 Features por impureza de Gini (Random Forest)}
 \label{fig:top5-gini}
 \begin{center}
-	\includegraphics[width=0.85\textwidth]{USPSC-img/figuras/fig12-top5-gini.png}
+	\includegraphics[width=0.85\textwidth]{USPSC-img/figuras/fig12-top5-gini}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -347,7 +424,7 @@ A análise SHAP via TreeExplainer \cite{lundberg2020} enriquece o ranking de Gin
 \caption{Importância média \shapabs{} das features (Random Forest)}
 \label{fig:shap-importancia}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig13-shap-importancia-media.png}
+	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig13-shap-importancia-media}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -360,7 +437,7 @@ Para verificar a estabilidade da ordenação por critério independente do estim
 
 Registra-se, por completude, que um terceiro estimador de importância, a permutação de features calculada sobre o conjunto de teste, produz ordenação distinta das duas anteriores, elevando avg\_installments à primeira posição e deslocando frequency para a quarta. Esse estimador não é informativo no regime amostral deste trabalho: com dez instâncias da classe Ativo no hold-out, o desvio-padrão de cada estimativa situa-se entre 44\% e 93\% da respectiva média nas nove variáveis de média positiva, e as duas restantes apresentam média negativa, valor que não admite interpretação substantiva. A imprecisão é suficiente para dissolver a própria ordenação que o estimador produz: a primeira e a segunda colocadas, avg\_installments (0,0788 $\pm$ 0,0449) e recency\_days (0,0721 $\pm$ 0,0508), apresentam intervalos amplamente sobrepostos. A divergência observada não refuta, portanto, a ordenação por Gini, mas impede que se afirme robustez da hierarquia ao método de estimação, razão pela qual a estabilidade entre partições foi adotada como evidência.
 
-A análise de interpretabilidade conduzida até aqui apoia-se no Random Forest, modelo de produção. Cabe verificar em que medida a hierarquia de importância obtida é propriedade dos dados ou artefato do estimador escolhido. A importância por impureza de Gini não permite essa verificação, por não estar disponível no HistGradientBoostingClassifier nem se aplicar a modelos lineares. Os valores SHAP, ao contrário, são calculáveis para os três modelos e constituem, portanto, o único terreno comum de comparação. A Tabela \ref{tab:shap-tres-modelos} apresenta a posição de cada feature no ranking por importância média absoluta e sua participação relativa no total de cada modelo, calculadas sobre o mesmo conjunto de teste.
+A análise de interpretabilidade conduzida até aqui apoia-se no Random Forest, modelo adotado. Cabe verificar em que medida a hierarquia de importância obtida é propriedade dos dados ou artefato do estimador escolhido. A importância por impureza de Gini não permite essa verificação, por não estar disponível no HistGradientBoostingClassifier nem se aplicar a modelos lineares. Os valores SHAP, ao contrário, são calculáveis para os três modelos e constituem, portanto, o único terreno comum de comparação. A Tabela \ref{tab:shap-tres-modelos} apresenta a posição de cada feature no ranking por importância média absoluta e sua participação relativa no total de cada modelo, calculadas sobre o mesmo conjunto de teste.
 
 \begin{table}[htbp]
 \ABNTEXfontereduzida
@@ -406,7 +483,7 @@ Registra-se, como divergência pontual entre os métodos, que a variável top\_c
 \caption{Valores SHAP (beeswarm) das features no conjunto de teste}
 \label{fig:shap-beeswarm}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig14-shap-beeswarm.png}
+	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig14-shap-beeswarm}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -423,13 +500,13 @@ Esse achado tem implicação estratégica direta: a diversidade de categorias, u
 
 Registra-se, como ressalva metodológica, que a classe Ativo conta com aproximadamente 50 clientes na base completa, de modo que o perfil de retenção descrito, ainda que consistente entre a análise exploratória, a importância por Gini estimada em trinta partições e os valores SHAP dos três modelos, deve ser interpretado como hipótese robusta a ser confirmada em bases de maior volume.
 
-Todos os valores das figuras abaixo referem-se ao modelo Random Forest adotado como modelo de produção, calculados sobre o conjunto de teste. Os dependence plots das Figuras \ref{fig:dep-frequency}, \ref{fig:dep-recency} e \ref{fig:dep-ncategories} evidenciam que as relações capturadas pelo modelo não são lineares. Para frequency, as contribuições concentram-se em dois agrupamentos disjuntos: clientes com dois pedidos recebem contribuição positiva para o churn, entre 0,08 e 0,15, e clientes com três ou mais pedidos recebem contribuição negativa, o que caracteriza um limiar de decisão e não uma tendência gradual. Para recency\_days a relação é monotônica crescente e aproximadamente sigmóide, com a transição de contribuição negativa para positiva ocorrendo em torno da média da distribuição padronizada. Para n\_categories o padrão repete a descontinuidade observada em frequency, com separação nítida entre clientes de uma ou duas categorias e clientes de três ou mais. Essa descontinuidade é a razão estrutural pela qual a frequência perde posições no ranking SHAP da Regressão Logística (Tabela \ref{tab:shap-tres-modelos}): um modelo linear não representa limiares dessa natureza.
+Todos os valores das figuras abaixo referem-se ao Random Forest, modelo adotado nas análises subsequentes, calculados sobre o conjunto de teste. Os dependence plots das Figuras \ref{fig:dep-frequency}, \ref{fig:dep-recency} e \ref{fig:dep-ncategories} evidenciam que as relações capturadas pelo modelo não são lineares. Para frequency, as contribuições concentram-se em dois agrupamentos disjuntos: clientes com dois pedidos recebem contribuição positiva para o churn, entre 0,08 e 0,15, e clientes com três ou mais pedidos recebem contribuição negativa, o que caracteriza um limiar de decisão e não uma tendência gradual. Para recency\_days a relação é monotônica crescente e aproximadamente sigmóide, com a transição de contribuição negativa para positiva ocorrendo em torno da média da distribuição padronizada. Para n\_categories o padrão repete a descontinuidade observada em frequency, com separação nítida entre clientes de uma ou duas categorias e clientes de três ou mais. Essa descontinuidade é a razão estrutural pela qual a frequência perde posições no ranking SHAP da Regressão Logística (Tabela \ref{tab:shap-tres-modelos}): um modelo linear não representa limiares dessa natureza.
 
 \begin{figure}[H]
 \caption{Dependence plots da feature frequency no SHAP (Random Forest)}
 \label{fig:dep-frequency}
 \begin{center}
-	\includegraphics[width=0.80\textwidth]{USPSC-img/figuras/fig15-shap-dependence-frequency.png}
+	\includegraphics[width=0.80\textwidth]{USPSC-img/figuras/fig15-shap-dependence-frequency}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -442,7 +519,7 @@ Todos os valores das figuras abaixo referem-se ao modelo Random Forest adotado c
 \caption{Dependence plots da feature recency\_days no SHAP (Random Forest)}
 \label{fig:dep-recency}
 \begin{center}
-	\includegraphics[width=0.85\textwidth]{USPSC-img/figuras/fig16-shap-dependence-recency.png}
+	\includegraphics[width=0.85\textwidth]{USPSC-img/figuras/fig16-shap-dependence-recency}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -455,7 +532,7 @@ Todos os valores das figuras abaixo referem-se ao modelo Random Forest adotado c
 \caption{Dependence plots da feature n\_categories no SHAP (Random Forest)}
 \label{fig:dep-ncategories}
 \begin{center}
-	\includegraphics[width=0.85\textwidth]{USPSC-img/figuras/fig17-shap-dependence-ncategories.png}
+	\includegraphics[width=0.85\textwidth]{USPSC-img/figuras/fig17-shap-dependence-ncategories}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -474,7 +551,7 @@ O cliente representativo da classe Ativo (Figura \ref{fig:waterfall-ativo}) rece
 \caption{Decomposição SHAP da predição para o cliente mais próximo do centroide da classe Ativo}
 \label{fig:waterfall-ativo}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig18-shap-waterfall-ativo.png}
+	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig18-shap-waterfall-ativo}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -487,7 +564,7 @@ O cliente representativo da classe Ativo (Figura \ref{fig:waterfall-ativo}) rece
 \caption{Decomposição SHAP da predição para o cliente mais próximo do centroide da classe Churn}
 \label{fig:waterfall-churn}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig19-shap-waterfall-churn.png}
+	\includegraphics[width=0.9\textwidth]{USPSC-img/figuras/fig19-shap-waterfall-churn}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -499,13 +576,13 @@ O cliente representativo da classe Ativo (Figura \ref{fig:waterfall-ativo}) rece
 \FloatBarrier
 \section{Segmentação de Risco e Recomendações de Negócio} \label{sec:segmentacao}
 
-Aplicado o modelo Random Forest à base completa de 1.178 clientes, cada cliente recebeu um score de probabilidade de churn, utilizado para classificação em quatro segmentos de risco \cite{kotler2016}. Os limiares de 25\%, 50\% e 75\% que delimitam os segmentos são cortes nominais da escala de probabilidade, adotados por interpretabilidade e não otimizados sobre os dados; sua adequação é aferida a posteriori pela taxa de churn observada em cada faixa. A Figura \ref{fig:distribuicao-scores} apresenta a distribuição desses scores nos três modelos de melhor desempenho, com os limiares que delimitam os quatro segmentos, e a Tabela \ref{tab:segmentacao} detalha a distribuição e o perfil médio de cada segmento sob o modelo de produção.
+Aplicado o modelo Random Forest à base completa de 1.178 clientes, cada cliente recebeu um score de probabilidade de churn, utilizado para classificação em quatro segmentos de risco \cite{kotler2016}. Os limiares de 25\%, 50\% e 75\% que delimitam os segmentos são cortes nominais da escala de probabilidade, adotados por interpretabilidade e não otimizados sobre os dados; sua adequação é aferida a posteriori pela taxa de churn observada em cada faixa. A Figura \ref{fig:distribuicao-scores} apresenta a distribuição desses scores nos três modelos de melhor desempenho, com os limiares que delimitam os quatro segmentos, e a Tabela \ref{tab:segmentacao} detalha a distribuição e o perfil médio de cada segmento sob o modelo adotado.
 
 \begin{figure}[htbp]
 \caption{Distribuição dos scores de probabilidade de churn e limiares de segmentação nos três modelos}
 \label{fig:distribuicao-scores}
 \begin{center}
-	\includegraphics[width=0.95\textwidth]{USPSC-img/figuras/fig20-distribuicao-scores.png}
+	\includegraphics[width=0.95\textwidth]{USPSC-img/figuras/fig20-distribuicao-scores}
 \end{center}
 \begin{flushleft}
 	\ABNTEXfontereduzida
@@ -546,6 +623,6 @@ A leitura com valor preditivo, contudo, é restrita ao conjunto de teste, cujos 
 
 Registra-se, por transparência, que o recorte alternativo composto pelas duas faixas de menor risco não apresenta a mesma estabilidade: na base completa ele reúne 42 dos 50 clientes Ativos em 10,9\% das observações, lift de 7,73 vezes, mas no conjunto de teste reúne apenas dois dos dez em 8,1\%, lift de 2,48 vezes. A diferença decorre de os quarenta clientes ativos presentes no conjunto de treino situarem-se integralmente nessas duas faixas. Verifica-se, assim, que a estratificação separa risco fora da amostra, com magnitude da ordem de duas vezes, magnitude que deve ser lida com cautela em razão do número reduzido de clientes Ativos no conjunto de teste.
 
-Com base nos scores de risco, propõem-se ações diferenciadas de retenção: clientes no segmento Baixo devem ser priorizados para cross-sell; no Médio, são candidatos a campanhas de reengajamento leve, como newsletters; o segmento Alto requer abordagem mais ativa, com descontos personalizados; e o segmento Crítico demanda ação urgente, com cupons de alto impacto antes do abandono definitivo. O princípio econômico orientador é escalonar o investimento conforme o risco cresce, aplicação prática do argumento de \citeonline{reichheld2000} de que, no comércio eletrônico, a rentabilidade do cliente depende da extensão do relacionamento, o que torna a retenção economicamente preferível à reaquisição. A leitura em cobertura fixa apresentada na Seção \ref{sec:benchmark} fornece o parâmetro de dimensionamento dessas campanhas: abordar 35,6\% dos clientes (fração medida no conjunto de teste, único recorte fora da amostra) é suficiente, sob o modelo de produção, para alcançar 90\% dos clientes com propensão real ao retorno.
+Com base nos scores de risco, propõem-se ações diferenciadas de retenção: clientes no segmento Baixo devem ser priorizados para cross-sell; no Médio, são candidatos a campanhas de reengajamento leve, como newsletters; o segmento Alto requer abordagem mais ativa, com descontos personalizados; e o segmento Crítico demanda ação urgente, com cupons de alto impacto antes do abandono definitivo. O princípio econômico orientador é escalonar o investimento conforme o risco cresce, aplicação prática do argumento de \citeonline{reichheld2000} de que, no comércio eletrônico, a rentabilidade do cliente depende da extensão do relacionamento, o que torna a retenção economicamente preferível à reaquisição. A leitura em cobertura fixa apresentada na Seção \ref{sec:benchmark} fornece o parâmetro de dimensionamento dessas campanhas: abordar 35,6\% dos clientes (fração medida no conjunto de teste, único recorte fora da amostra) é suficiente, sob o modelo adotado, para alcançar 90\% dos clientes com propensão real ao retorno.
 
 \FloatBarrier

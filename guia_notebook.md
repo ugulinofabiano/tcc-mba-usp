@@ -10,8 +10,10 @@ Autor: Fabiano Rodrigues Ugulino. Orientadora: Profa. Dra. Cibele M. Russo
 
 Este documento explica, em ordem sequencial, o que o notebook faz, por que faz e o que ele encontra. O objetivo é que qualquer pessoa, mesmo sem familiaridade com Machine Learning aplicado a dados de e-commerce, consiga acompanhar o raciocínio do início ao fim, entender as decisões metodológicas e reproduzir o trabalho.
 
-A estrutura segue exatamente a do notebook: Seções 0, 1, 1.1, 2, 3, 4, 4.1, 5, 6, 7, 7.1, 8, 8.5, 8.6, a comparação SHAP entre os três modelos finalistas, a análise de estabilidade da importância, 9 (incluindo os diagnósticos comparativos e a curva de captura em cobertura fixa), 10, as duas figuras de fechamento e o sumário final. Cada bloco é apresentado em quatro partes: **O que faz**, **Por que faz assim** (justificativa metodológica), **Como faz** (descrição técnica) e **Resultado obtido** (números da execução de referência, seed 42).
+A estrutura segue exatamente a do notebook: Seções 0, 1, 1.1, 2, 3, 4, 4.1, 5, 6, 7, 7.1, 8, 8.5, 8.6, a comparação SHAP entre os três modelos finalistas, a análise de estabilidade da importância, 9 (incluindo os diagnósticos comparativos e a curva de captura em cobertura fixa), 10, as duas figuras de fechamento, as verificações finais pedidas pela banca e o sumário final. Cada bloco é apresentado em quatro partes: **O que faz**, **Por que faz assim** (justificativa metodológica), **Como faz** (descrição técnica) e **Resultado obtido** (números da execução de referência, seed 42).
 
+> **Revisão de outubro de 2026 (pontos da banca).** Esta revisão acompanha a versão corrigida da monografia (`tcc_latex/USPSC-modelo-ICMC-PORTUGUES.pdf`, que substitui o antigo `docs/tcc.pdf`). Mudam cinco coisas: (i) **a seleção do modelo deixa de usar o hold-out** e passa a ser feita em dois estágios sobre as probabilidades *out-of-fold* do treino (Ponto 4); o leaderboard agora é ordenado pela AUC-OOF, e o hold-out vira avaliação final única; (ii) **o Δ entre validação cruzada e hold-out passa a ter sinal**, e o limite de 0,15 vira diagnóstico descritivo, com o erro padrão de Hanley e McNeil (1982) como referência (Ponto 7); (iii) a imputação de `payment_value`, código morto, foi removida, e uma nova célula **quantifica o vazamento da imputação anterior ao split, que é numericamente nulo** (Ponto 3); (iv) **todas as figuras passam a ser gravadas em PDF vetorial**, já com o nome final `figNN-*.pdf` e recortadas por código (Ponto 5); (v) a monografia ganhou a Seção 4.2 (comparação das estratégias de balanceamento, antes em 3.4) e o Quadro 2 (hierarquia das métricas), o que **desloca em uma posição as Seções 4.2 a 4.7 e o antigo Quadro 2**, agora Quadro 3. Figuras 1 a 20 e Tabelas 1 a 8 mantêm a numeração. Os números da execução de referência não mudaram; entram números novos, os das verificações *out-of-fold*.
+>
 > **Revisão de setembro de 2026.** Este guia foi atualizado para refletir a versão final do notebook e a monografia entregue (`docs/tcc.pdf`, declaração datada de 21/09/2026). Em relação à revisão de agosto, entram a escolha declarada do modelo de produção, a comparação SHAP entre Random Forest, HistGradient Boosting e Regressão Logística (Tabela 7 do TCC), a curva de captura em cobertura fixa, a célula de consolidação numérica e a renumeração de tabelas, figuras e seções conforme o PDF final. A leitura da importância por permutação também foi corrigida: no regime amostral deste trabalho ela não é informativa, e não deve ser usada como evidência de impacto preditivo. Os números da execução de referência não mudaram.
 
 ---
@@ -25,17 +27,18 @@ A estrutura segue exatamente a do notebook: Seções 0, 1, 1.1, 2, 3, 4, 4.1, 5,
 | Seção 3 | 3.3 | Tabela 1 |
 | Seções 4 e 4.1 | 3.3 (validação do filtro) e 3.4 (target) | |
 | Seção 5 | 4.1 | Figuras 3 a 6 |
-| Seção 6 | 3.4 | Quadro 1, Tabelas 2 e 3 |
-| Seção 7 | 3.5, 4.2 e 4.4 | Tabela 4, Quadro 2, Figuras 7 a 10 |
-| Seção 7.1 | 4.3 | |
-| Seção 8 | 4.6 | Tabela 6, Figuras 11 e 12 |
-| Seção 8.5 | 4.5 e 4.5.1 | Tabela 5 |
-| Seção 8.6 | 4.6 e 4.6.1 | Figuras 13 a 19 |
-| SHAP nos três modelos | 4.6 | Tabela 7 |
-| Estabilidade entre partições | 4.6 | |
-| Seção 9 (segmentação e diagnósticos) | 4.2 e 4.7 | Tabela 8, Figura 20 |
-| Curva de captura em cobertura fixa | 4.2, 4.7 e Conclusão | |
+| Seção 6 | 3.4 e 4.2 | Quadro 1 (3.4), Tabelas 2 e 3 (4.2) |
+| Seção 7 | 3.5, 4.3 e 4.5 | Tabela 4, Quadros 2 e 3, Figuras 7 a 10 |
+| Seção 7.1 | 4.4 | |
+| Seção 8 | 4.7 | Tabela 6, Figuras 11 e 12 |
+| Seção 8.5 | 4.6 e 4.6.1 | Tabela 5 |
+| Seção 8.6 | 4.7 e 4.7.1 | Figuras 13 a 19 |
+| SHAP nos três modelos | 4.7 | Tabela 7 |
+| Estabilidade entre partições | 4.7 | |
+| Seção 9 (segmentação e diagnósticos) | 4.3 e 4.8 | Tabela 8, Figura 20 |
+| Curva de captura em cobertura fixa | 4.3, 4.8 e Conclusão | |
 | Figuras de fechamento | 3 (abertura) e 3.2 | Figuras 1 e 2 |
+| Verificações finais (imputação e seleção *out-of-fold*) | 3.5, 4.3 e Conclusão | |
 
 ---
 
@@ -59,7 +62,7 @@ Construir um modelo preditivo que, a partir de variáveis comportamentais de cad
 - **Validação empírica do filtro de compradores únicos** (Seção 4.1): não é argumento puramente teórico, é demonstrado por ablação
 - **Protocolo multi-métrica** (Seções 7 e 7.1): avalia AUC, Average Precision, F1-Macro, MCC, G-Mean e Kappa em conjunto, e mede a concordância entre rankings pela correlação de Spearman, respondendo a uma limitação metodológica documentada por De la Cruz Huayanay, Bazán e Russo (2025)
 - **Reamostragem e limiar sem vazamento**: o balanceamento ocorre dentro de cada fold da validação cruzada, e o limiar de decisão é derivado das probabilidades *out-of-fold* do treino, nunca do conjunto de teste. O efeito da correção é quantificado (queda de até 0,3251 na CV-AUC)
-- **Escolha declarada do modelo de produção**, fundamentada na qualidade da ordenação e verificada por **captura em cobertura fixa**, em vez de eleger automaticamente o maior valor de uma métrica
+- **Seleção do modelo sem tocar o hold-out**: elegibilidade pela importância nativa de Gini e ordenação dos elegíveis por AUC, captura em cobertura fixa e ocupação das faixas, tudo estimado sobre as probabilidades *out-of-fold* do treino, em vez de eleger automaticamente o maior valor de uma métrica no teste
 - **Validação de representatividade do balanceamento** (Seção 8.5, PSI e KS-test)
 - **Estabilidade da importância entre partições** e comparação SHAP entre três modelos, em vez de tratar a concordância Gini/SHAP como validação independente (os dois métodos leem a mesma estrutura de árvores)
 
@@ -91,6 +94,15 @@ A semente fixa (`random_state = 42`) é aplicada em todas as operações estocá
 ### Como faz
 
 Constantes `OBS_START`, `OBS_END` e `PRED_END` marcam as janelas. Na prática, apenas `OBS_END` (2018-01-01) e `PRED_END` (2018-06-01) operam como filtros efetivos no pipeline (ver Seção 2); `OBS_START` é um marco nominal.
+
+Uma célula logo após os imports define o padrão de gravação das figuras (Ponto 5 da banca). As figuras eram PNG de 583 a 1.312 px, o que dava de 109 a 219 dpi efetivos na largura de impressão, e quinze das vinte ficavam abaixo de 150 dpi. Agora todas saem em **PDF vetorial**:
+
+| Função | Papel |
+|---|---|
+| `salvar_figura(fig, nome, rasterizar_pontos=False, pad=0.05)` | Grava a figura inteira em `nome.pdf` |
+| `salvar_painel(fig, eixos, nome, pad=0.10, rasterizar_pontos=False)` | Grava só a região ocupada por um ou mais subplots, com título, legenda e barra de cores, o que dispensa o recorte manual de painéis compostos |
+
+`pdf.fonttype = 42` deixa o texto do PDF selecionável e pesquisável. Em gráficos com um marcador por cliente (beeswarm, dependence plots), `rasterizar_pontos=True` rasteriza só os marcadores a 300 dpi e mantém eixos e rótulos em vetor, para o arquivo não ficar pesado. Os arquivos já saem com o nome usado no LaTeX (`fig01-pipeline.pdf` a `fig20-distribuicao-scores.pdf`); basta copiá-los para `tcc_latex/USPSC-img/figuras/`, onde o `\includegraphics` os referencia sem extensão.
 
 ### Resultado obtido
 
@@ -229,7 +241,19 @@ Une pedidos, clientes, itens, produtos, pagamentos e avaliações da janela de o
 
 A metodologia **RFM (Recência, Frequência, Valor Monetário)** é um dos frameworks mais consolidados de análise comportamental de clientes, com origem no marketing direto (HUGHES, 1994). As três dimensões capturam de forma objetiva o que importa em um relacionamento comercial: quando o cliente comprou pela última vez, com que frequência ele compra e quanto ele gasta.
 
-RFM puro é incompleto para predição de churn moderna. A literatura recente (MANZOOR et al., 2024) recomenda enriquecer com variáveis adicionais que capturem engajamento, satisfação e padrão de pagamento. Por isso, foram adicionadas oito features complementares: ticket médio, tempo médio de entrega, nota média das avaliações, número médio de parcelas, frete médio, número de categorias distintas, categoria principal e estado do cliente.
+RFM puro é incompleto para predição de churn moderna. A literatura recente (MANZOOR et al., 2024) recomenda enriquecer com variáveis adicionais que capturem engajamento, satisfação e padrão de pagamento. A Tabela 1 do TCC ganhou uma coluna **Dimensão** que explicita a correspondência de cada feature com o RFM:
+
+| Dimensão | Features | Leitura |
+|---|---|---|
+| R, F, M | `recency_days`, `frequency`, `monetary` | Uma feature para cada dimensão do modelo |
+| M* (derivada) | `avg_ticket` | Quociente `monetary / frequency`: recompõe duas dimensões já presentes, não é uma quarta |
+| C (complementar) | `avg_delivery_days`, `avg_freight` | Experiência de compra: atributos do serviço prestado, não do comportamento do cliente |
+| C | `avg_review_score` | Satisfação declarada |
+| C | `avg_installments` | Comportamento de pagamento |
+| C | `n_categories`, `top_category` | Perfil de consumo |
+| C | `customer_state` | Contexto: localização do cliente, não comportamento transacional |
+
+São, portanto, três features RFM diretas, uma derivada e sete complementares.
 
 O ponto mais delicado do cálculo é `monetary`. O join intermediário replica o pagamento uma vez por item (43.695 pedidos viram 52.915 linhas): somar `payment_value` diretamente inflaria o gasto de quem comprou vários produtos no mesmo pedido. A solução reconstrói o valor de cada pedido a partir de `payments_df` e agrega por cliente contando cada pedido uma única vez, garantindo que `avg_ticket = monetary / frequency` seja de fato o ticket médio por pedido. Três `assert` verificam essa consistência ao final da célula.
 
@@ -250,7 +274,9 @@ top_category       = MODE(product_category_name)
 customer_state     = UF do cliente
 ```
 
-Nulos são tratados por critério específico de cada variável, não por um valor único: mediana para avaliações e pagamentos, zero para frete (ausência significa frete grátis), `1` para parcelas (à vista) e o rótulo `desconhecido` para categoria ausente. Esse tratamento ocorre inteiramente na janela de observação, antes da definição do target, e portanto sem acesso a informação da janela de predição.
+Nulos são tratados por critério específico de cada variável, não por um valor único: mediana para `review_score` e para o valor do pedido (`order_value`, que alimenta `monetary` e `avg_ticket`), zero para frete (ausência significa frete grátis), `1` para parcelas (à vista) e o rótulo `desconhecido` para categoria ausente. Esse tratamento ocorre inteiramente na janela de observação, antes da definição do target, e portanto sem acesso a informação da janela de predição.
+
+> **Imputação anterior ao split (Ponto 3 da banca).** A versão anterior também imputava `feat_df['payment_value']` pela mediana. Era código morto: nenhuma feature lê essa coluna, porque o valor do pedido é reconstruído a partir de `payments_df`. A linha foi removida para não sugerir um vazamento que não existe por esse caminho. As duas medianas que de fato alimentam features (`review_score` e `order_value`) continuam estimadas sobre a tabela transacional inteira, isto é, **antes** da divisão treino/teste. O efeito disso é medido numa célula de verificação ao final do notebook (ver [Verificações Finais](#verificações-finais-pontos-3-e-4-da-banca)) e é numericamente nulo nos 1.178 clientes modelados. O TCC (Seção 3.5) registra a reordenação dessa etapa como trabalho futuro.
 
 > **Duas ressalvas registradas no TCC.** (i) O rótulo `desconhecido` é contado como categoria distinta por `COUNT(DISTINCT ...)`, de modo que um cliente com pedido nessa condição pode ter `n_categories` acrescido em uma unidade (nota da Tabela 1). (ii) O Label Encoding de `top_category` e `customer_state` faz os modelos de árvore tratarem o inteiro atribuído a cada categoria como grandeza ordenada, o que recomenda cautela na leitura da posição de `top_category` nos rankings de importância. Codificações alternativas (target encoding, agrupamento de categorias raras) constam entre os trabalhos futuros.
 
@@ -315,7 +341,7 @@ Nesta célula também são definidas as funções e constantes centrais reaprove
 | `CV_SPLITTER` | `StratifiedKFold(n_splits=5, shuffle=True, random_state=42)` |
 | `THRESHOLD_SCAN` | 200 valores entre 0,01 e 0,99 |
 | `CRITERIO_LIMIAR` | `'kappa'` (adotado); `'f1'` como sensibilidade |
-| `GAP_MAX` | 0,15, referência para a verificação de `|CV - hold-out|`, reportada mas não usada para descartar modelos |
+| `GAP_MAX` | 0,15, sinalizador descritivo para `Δ = CV-AUC − AUC(hold-out)`, aplicado só a Δ positivo; não descarta modelos |
 
 ### Como faz
 
@@ -336,7 +362,7 @@ Incluir compradores únicos derruba o AUC em **0,2875 ponto** (aproximando o mod
 
 ### O que faz
 
-Calcula estatísticas descritivas por classe e produz as visualizações que caracterizam o perfil comportamental de clientes Ativos versus Churn. O painel 2x2 origina as **Figuras 3 a 6** do TCC (recência, frequência, review score e proporção de classes), discutidas na Seção 4.1.
+Calcula estatísticas descritivas por classe e produz as visualizações que caracterizam o perfil comportamental de clientes Ativos versus Churn. O painel 2x2 origina as **Figuras 3 a 6** do TCC (recência, frequência, review score e proporção de classes), discutidas na Seção 4.1. Cada quadrante é gravado por `salvar_painel` como uma figura separada (`fig03-eda-recencia.pdf`, `fig04-eda-frequencia.pdf`, `fig05-eda-review-score.pdf`, `fig06-proporcao-churn-ativo.pdf`). O recorte por código substitui o recorte manual, que além de degradar a resolução havia trocado o conteúdo da Figura 3 na versão depositada.
 
 ### Por que faz assim
 
@@ -410,7 +436,7 @@ Onze features ao todo: 9 numéricas e 2 categóricas codificadas. Dois terços d
 
 ### Comparação empírica das estratégias de balanceamento
 
-Avalia quatro alternativas (sem balanceamento, undersampling puro 1:1, SMOTE e a combinação adotada under 3:1 + ruído gaussiano), primeiro num split de referência e depois em **trinta divisões independentes**, com reamostragem sempre feita dentro do fold e limiar sempre derivado do treino. O modelo de referência é o Random Forest, mantido fixo: o que se compara são estratégias de reamostragem, não algoritmos. O resultado origina o **Quadro 1** e as **Tabelas 2 e 3** do TCC.
+Avalia quatro alternativas (sem balanceamento, undersampling puro 1:1, SMOTE e a combinação adotada under 3:1 + ruído gaussiano), primeiro num split de referência e depois em **trinta divisões independentes**, com reamostragem sempre feita dentro do fold e limiar sempre derivado do treino. O modelo de referência é o Random Forest, mantido fixo: o que se compara são estratégias de reamostragem, não algoritmos. O resultado origina o **Quadro 1** (Seção 3.4) e as **Tabelas 2 e 3** do TCC, estas agora numa seção própria de resultados, a 4.2.
 
 Com apenas dez clientes Ativos no teste, um único split pode favorecer qualquer estratégia por acaso. Repetir trinta vezes e reportar média com desvio padrão mostra se a vantagem observada é real ou coincidência.
 
@@ -446,7 +472,7 @@ A média de 0,6686 nas trinta partições é também a principal referência de 
 
 ### O que faz
 
-Treina **dez algoritmos de Machine Learning**, todos com validação cruzada estratificada de 5 folds e reamostragem executada dentro de cada fold, e avalia cada um no hold-out por um conjunto de métricas. Deriva o ponto de corte individualmente a partir do treino, monta o leaderboard (**Tabela 4** do TCC) e declara o modelo de produção.
+Treina **dez algoritmos de Machine Learning**, todos com validação cruzada estratificada de 5 folds e reamostragem executada dentro de cada fold, e avalia cada um no hold-out por um conjunto de métricas. Deriva o ponto de corte individualmente a partir do treino, calcula as métricas de seleção sobre as probabilidades *out-of-fold* do treino, monta o leaderboard (**Tabela 4** do TCC) e declara o modelo de produção.
 
 ### Por que dez algoritmos
 
@@ -474,7 +500,7 @@ A coluna `CV-AUC vazada` do leaderboard reproduz deliberadamente o procedimento 
 | Logistic Regression | 0,7115 | 0,6326 | 0,0789 |
 | Naive Bayes | 0,7024 | 0,6390 | 0,0634 |
 
-O caso do KNN é ilustrativo: a CV-AUC passa de 0,9135 para 0,5913, valor compatível com os 0,5336 do hold-out. A conclusão do TCC (Seção 4.2) é que a diferença entre validação cruzada e hold-out observada na concepção inicial media vazamento entre partições, e não sobreajuste.
+O caso do KNN é ilustrativo: a CV-AUC passa de 0,9135 para 0,5913, valor compatível com os 0,5336 do hold-out. A conclusão do TCC (Seção 4.3) é que a diferença entre validação cruzada e hold-out observada na concepção inicial media vazamento entre partições, e não sobreajuste.
 
 ### Por que protocolo multi-métrica
 
@@ -482,9 +508,23 @@ Em contextos desbalanceados a acurácia é enganosa (prever sempre Churn dá cer
 
 A coluna `AP` do leaderboard é a Average Precision da classe **Churn**, cuja linha de base é a própria prevalência (0,958). Sua magnitude absoluta é pouco informativa; o que importa é a comparação entre modelos. A AP da classe Ativo é calculada em célula separada, adiante.
 
+**Hierarquia das métricas (Quadro 2 do TCC, novo).** Com tantas métricas, algoritmos diferentes vencem conforme o indicador escolhido. O TCC passou a declarar o papel de cada uma na decisão:
+
+| Camada | Métricas | Papel |
+|---|---|---|
+| Primária (decide a seleção; estimada fora da amostra) | ROC-AUC *out-of-fold*; Ativos capturados em cobertura fixa; ocupação das faixas de risco | Medem ordenação, eficiência do recorte e usabilidade da segmentação, que é o entregável |
+| Secundária (reportada, não decisória) | MCC, G-Mean, Kappa; Precisão e Recall por classe | Descrevem a regra de decisão binária no limiar adotado |
+| Diagnóstica (apoia a leitura) | Average Precision; F1-Macro; Δ; limiar | AP só admite comparação entre modelos; F1-Macro é critério alternativo do limiar; Δ indica concordância direcional; o limiar é parâmetro, não desempenho |
+
+As métricas primárias são estimadas sobre as probabilidades *out-of-fold* do treino, de modo que a hierarquia e a independência do conjunto de teste são um único critério.
+
 ### Sobre a verificação de sobreajuste
 
-A diferença `Δ = |CV-AUC - AUC hold-out|` é **verificada e reportada, mas não usada para descartar modelos**. O maior Δ observado é 0,1347 (Decision Tree), seguido de 0,1293 (Random Forest), ambos abaixo do limite de referência `GAP_MAX = 0,15`. O TCC registra que esse limite é um parâmetro operacional definido antes do benchmark, e não um valor extraído da literatura, e reporta a sensibilidade: sob 0,10, Decision Tree e Random Forest seriam descartados; sob 0,20, o resultado seria idêntico. Como nenhum modelo foi excluído, o critério não participou da escolha do modelo de produção.
+O Δ passou a ser definido **com sinal**: `Δ = CV-AUC − AUC(hold-out)` (Ponto 7 da banca). A versão anterior usava o valor absoluto, o que misturava duas situações opostas. Só Δ **positivo**, em que a validação cruzada supera o hold-out, é compatível com otimismo do procedimento de validação. Δ negativo significa hold-out mais favorável que a validação cruzada e nada diz sobre sobreajuste.
+
+Sob essa definição, apenas três modelos têm Δ positivo: Decision Tree (+0,1347), KNN (+0,0577) e Gradient Boosting (+0,0053), todos abaixo de `GAP_MAX = 0,15`. O Random Forest tem Δ = −0,1293: a magnitude é alta, mas vem de um hold-out **melhor** que a validação cruzada. O notebook imprime cada modelo como `SINALIZA`, `positivo, dentro do limite` ou `negativo, sem leitura de sobreajuste`; nenhum é sinalizado. Um corte simétrico de 0,10 sobre o valor absoluto descartaria Decision Tree e Random Forest juntos, embora seus Δ apontem em direções opostas, o que mostra por que a formulação absoluta era inadequada.
+
+O limite de 0,15 também mudou de estatuto: é **sinalizador descritivo, não teste de sobreajuste**. Com dez Ativos e 226 Churn no hold-out, o erro padrão da ROC-AUC pela aproximação de Hanley e McNeil (1982) fica entre 0,084 e 0,097 nos dez modelos; para o Random Forest, o intervalo de 95% vai de 0,65 a 0,97, amplitude de 0,33. Diferenças entre CV e hold-out menores que isso são compatíveis com variabilidade amostral, e o regime amostral não dá poder estatístico para um teste. O limite continua sendo um parâmetro operacional definido antes do benchmark, não um valor extraído da literatura, e não participou da escolha do modelo.
 
 ### Sobre o limiar
 
@@ -509,20 +549,24 @@ Hiperparâmetros principais:
 
 Sob o treino perfeitamente balanceado (120/120), `class_weight='balanced'` atribui pesos iguais às classes e é, portanto, neutro; o TCC o registra como padrão defensivo.
 
-### Resultado obtido, leaderboard (Tabela 4, ordenado por AUC)
+### Resultado obtido, leaderboard (Tabela 4)
+
+O leaderboard do notebook é agora **ordenado pela AUC-OOF**, o critério de seleção calculado só no treino, e ganha as colunas `AUC-OOF` e `AP-Ativo-OOF`. A coluna `AUC` continua sendo a do hold-out, mas não participa da seleção: é a avaliação final, posterior à escolha. A Tabela 4 do TCC reproduz as métricas de hold-out, ordenadas pela AUC de hold-out, com Δ com sinal:
 
 | Modelo | AUC | AP (Churn) | CV-AUC | Δ | F1-Macro | MCC | G-Mean | Kappa | Prec-Ativo | Rec-Ativo | Rec-Churn | Limiar |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Random Forest** | **0,8106** | **0,9905** | 0,6814 | 0,1293 | 0,5957 | 0,1931 | 0,4412 | 0,1918 | 0,2500 | 0,20 | 0,9735 | 0,38 |
-| HistGradient Boosting | 0,7615 | 0,9872 | 0,7363 | 0,0252 | 0,6049 | 0,2143 | **0,5342** | 0,2110 | 0,2143 | 0,30 | 0,9513 | 0,18 |
-| Extra Trees | 0,7491 | 0,9860 | 0,6777 | 0,0714 | 0,5649 | 0,1639 | 0,3148 | 0,1370 | 0,3333 | 0,10 | 0,9912 | 0,34 |
-| Logistic Regression | 0,7075 | 0,9838 | 0,6326 | 0,0749 | 0,6440 | **0,3517** | 0,4462 | **0,2939** | 0,6667 | 0,20 | 0,9956 | 0,12 |
-| SVM | 0,7035 | 0,9833 | 0,6238 | 0,0798 | 0,4920 | 0,0250 | 0,4111 | 0,0197 | 0,0541 | 0,20 | 0,8451 | 0,37 |
-| Gradient Boosting | 0,6642 | 0,9796 | 0,6695 | 0,0053 | 0,5339 | 0,0679 | 0,3106 | 0,0678 | 0,1111 | 0,10 | 0,9646 | 0,08 |
-| Naive Bayes | 0,6405 | 0,9552 | 0,6390 | 0,0015 | 0,5887 | 0,1778 | 0,4402 | 0,1775 | 0,2222 | 0,20 | 0,9690 | 0,01 |
-| AdaBoost | 0,5544 | 0,9694 | 0,5372 | 0,0172 | 0,5725 | 0,2100 | 0,3155 | 0,1547 | 0,5000 | 0,10 | 0,9956 | 0,47 |
-| KNN | 0,5336 | 0,9596 | 0,5913 | 0,0577 | 0,5143 | 0,0314 | 0,3063 | 0,0307 | 0,0667 | 0,10 | 0,9381 | 0,09 |
-| Decision Tree | 0,4772 | 0,9559 | 0,6119 | 0,1347 | 0,4592 | 0,0178 | 0,4708 | 0,0112 | 0,0484 | 0,30 | 0,7389 | 0,61 |
+| **Random Forest** | **0,8106** | **0,9905** | 0,6814 | −0,1293 | 0,5957 | 0,1931 | 0,4412 | 0,1918 | 0,2500 | 0,20 | 0,9735 | 0,38 |
+| HistGradient Boosting | 0,7615 | 0,9872 | 0,7363 | −0,0252 | 0,6049 | 0,2143 | **0,5342** | 0,2110 | 0,2143 | 0,30 | 0,9513 | 0,18 |
+| Extra Trees | 0,7491 | 0,9860 | 0,6777 | −0,0714 | 0,5649 | 0,1639 | 0,3148 | 0,1370 | 0,3333 | 0,10 | 0,9912 | 0,34 |
+| Logistic Regression | 0,7075 | 0,9838 | 0,6326 | −0,0749 | 0,6440 | **0,3517** | 0,4462 | **0,2939** | 0,6667 | 0,20 | 0,9956 | 0,12 |
+| SVM | 0,7035 | 0,9833 | 0,6238 | −0,0798 | 0,4920 | 0,0250 | 0,4111 | 0,0197 | 0,0541 | 0,20 | 0,8451 | 0,37 |
+| Gradient Boosting | 0,6642 | 0,9796 | 0,6695 | +0,0053 | 0,5339 | 0,0679 | 0,3106 | 0,0678 | 0,1111 | 0,10 | 0,9646 | 0,08 |
+| Naive Bayes | 0,6405 | 0,9552 | 0,6390 | −0,0015 | 0,5887 | 0,1778 | 0,4402 | 0,1775 | 0,2222 | 0,20 | 0,9690 | 0,01 |
+| AdaBoost | 0,5544 | 0,9694 | 0,5372 | −0,0172 | 0,5725 | 0,2100 | 0,3155 | 0,1547 | 0,5000 | 0,10 | 0,9956 | 0,47 |
+| KNN | 0,5336 | 0,9596 | 0,5913 | +0,0577 | 0,5143 | 0,0314 | 0,3063 | 0,0307 | 0,0667 | 0,10 | 0,9381 | 0,09 |
+| Decision Tree | 0,4772 | 0,9559 | 0,6119 | +0,1347 | 0,4592 | 0,0178 | 0,4708 | 0,0112 | 0,0484 | 0,30 | 0,7389 | 0,61 |
+
+O TCC não destaca em negrito as colunas Δ e Limiar: Δ é diagnóstico direcional (o valor mais próximo de zero não designa o melhor modelo) e o limiar é parâmetro da regra, não desempenho.
 
 **Líder por métrica**: AUC e AP, Random Forest; MCC e Kappa, Regressão Logística; G-Mean e Recall-Ativo, HistGradient Boosting. Nenhum modelo acerta mais de 3 dos 10 Ativos do hold-out, e o Recall-Ativo assume só três valores (0,10, 0,20 e 0,30): consequência matemática de dez instâncias na classe minoritária, não falha algorítmica (LUQUE et al., 2019).
 
@@ -539,17 +583,36 @@ A liderança da Regressão Logística em MCC e Kappa decorre integralmente da re
 
 ### Escolha declarada do modelo de produção
 
-A versão anterior do notebook elegia automaticamente o maior ROC-AUC. A versão final fixa a escolha na constante `MODELO_PRODUCAO = 'Random Forest'`, com a justificativa escrita no próprio código e reproduzida na Seção 4.2 do TCC:
+A escolha continua fixada na constante `MODELO_PRODUCAO = 'Random Forest'`, mas **a fundamentação mudou** (Ponto 4 da banca). A objeção era que o hold-out tinha sido usado para comparar os dez algoritmos e justificar a escolha, deixando de ser estimativa final independente. A versão corrigida aplica à escolha do estimador o mesmo princípio já aplicado ao limiar: **nenhuma grandeza usada na decisão vem do conjunto de teste**. A seleção, descrita nas Seções 3.5 e 4.3 do TCC, tem dois estágios:
 
-- **Sob as três métricas recomendadas**, o modelo indicado **não** seria o Random Forest (4º em MCC e G-Mean, 3º em Kappa). HistGradient Boosting e Regressão Logística empatam em posição média nos três rankings (1,67 cada), o que mostra que essas métricas apontam a inadequação do Random Forest para a decisão binária, mas não desempatam entre si.
-- **O critério vem da natureza do entregável.** O produto do trabalho não é uma decisão binária num limiar, e sim uma priorização em quatro faixas de risco (Seção 9), que depende da **ordenação** dos scores. As métricas independentes de limiar (ROC-AUC e AP) medem ordenação, e o Random Forest lidera ambas. A evidência decisiva, porém, é a **captura em cobertura fixa** (Seção 9), que independe de linha de base.
-- **Importância nativa.** O `HistGradientBoostingClassifier` não expõe `feature_importances_`, e a análise de interpretabilidade (objetivo específico 4 do TCC) apoia-se na importância por Gini e na estabilidade dessa ordenação entre partições.
+1. **Elegibilidade.** O objetivo específico 4 do TCC, declarado antes de qualquer experimento, exige a importância por impureza de Gini do modelo escolhido e a estabilidade dessa ordenação entre partições. Só são elegíveis os estimadores que a expõem nativamente: Random Forest, Extra Trees, Gradient Boosting, Decision Tree e AdaBoost. HistGradient Boosting, Regressão Logística, SVM, KNN e Naive Bayes ficam de fora por escopo, não por desempenho.
+2. **Ordenação dos elegíveis pela natureza do entregável**, sobre as probabilidades *out-of-fold* do treino (n = 942, 40 Ativos): qualidade da ordenação (AUC-OOF e captura em cobertura fixa) e usabilidade da segmentação (ocupação das faixas com os cortes da Tabela 8).
 
-O HistGradient Boosting permanece registrado como alternativa indicada caso o objetivo passe a ser maximizar a detecção da classe minoritária em regime de decisão binária, condicionada a calibração prévia de probabilidades (Platt scaling ou regressão isotônica; NICULESCU-MIZIL; CARUANA, 2005). Os três finalistas (Random Forest, HistGradient Boosting e Regressão Logística) são comparados no **Quadro 2** do TCC.
+**Números da seleção, todos sem o hold-out** (das células de verificação descritas em [Verificações Finais](#verificações-finais-pontos-3-e-4-da-banca)):
+
+| Elegível | AUC-OOF | Ativos em 30% de cobertura | % no Crítico | Ativos fora do Crítico | Cobertura | Lift |
+|---|---|---|---|---|---|---|
+| **Random Forest** | **0,6784** | **23/40** | 55,0% | 28/40 (70,0%) | 45,0% | 1,56 |
+| Extra Trees | 0,6739 | 19/40 | 41,4% | 31/40 | 58,6% | 1,32 |
+| Gradient Boosting | 0,6702 | 21/40 | 81,5% | 15/40 | 18,5% | 2,03 |
+| Decision Tree | 0,6087 | 16/40 | 66,7% | 20/40 | 33,3% | 1,50 |
+| AdaBoost | 0,5347 | 15/40 | 0,1% | 40/40 | 99,9% | 1,00 |
+
+O Random Forest lidera a ordenação entre os elegíveis e entrega o melhor compromisso na segmentação: o Gradient Boosting tem lift maior, mas empilha 81,5% da base no Crítico e retém só 15 Ativos; o Extra Trees retém 31, mas exige 58,6% de cobertura; o AdaBoost degenera, com praticamente toda a base fora do Crítico e lift unitário.
+
+**O que os mesmos critérios diriam sem a restrição de elegibilidade.** O HistGradient Boosting tem a **maior AUC-OOF dos dez (0,7323)** e também lidera a captura em 30% de cobertura (25 de 40). Sua exclusão decorre do requisito de interpretabilidade, não de ordenação inferior, e o TCC diz isso explicitamente. Em compensação, sua segmentação é menos utilizável: concentra 75,1% dos clientes no Crítico e retém 22 dos 40 Ativos fora dele (55,0% dos recuperáveis, contra 70,0% do Random Forest), com lift maior (2,20) porém recorte estreito. A causa é a dispersão dos scores, não a ordenação, e a correção pediria calibração prévia de probabilidades, registrada como trabalho futuro.
+
+**As métricas de decisão binária continuam apontando outro modelo.** Sob MCC, G-Mean e Kappa, o Random Forest é 4º, 4º e 3º; HistGradient Boosting e Regressão Logística empatam em posição média nos três rankings (1,67 cada). As métricas recomendadas mostram a inadequação do Random Forest para a decisão binária, mas não desempatam entre si, o que reforça que o critério precisa vir da natureza do entregável.
+
+**Papel do hold-out.** Concluída a seleção, o hold-out foi usado uma única vez, para a avaliação final (AUC 0,8106). Os valores de hold-out da Tabela 4 e do **Quadro 3** do TCC (antigo Quadro 2, comparação dos três finalistas) caracterizam os modelos, mas não fundamentaram a escolha. O TCC reconhece que as diferenças entre os elegíveis cabem dentro de um desvio padrão da variabilidade entre partições (Tabela 3): a seleção indica tendência, não superioridade estatisticamente estabelecida.
+
+> **Mensagem do notebook.** A célula do leaderboard ainda imprime "o líder em ROC-AUC é HistGradient Boosting. A escolha por Random Forest precisa estar justificada". Com o leaderboard ordenado por AUC-OOF, o primeiro colocado é o HistGradient Boosting; a justificativa pedida é o estágio de elegibilidade acima.
+
+O HistGradient Boosting permanece registrado como alternativa, condicionada a calibração prévia de probabilidades (Platt scaling ou regressão isotônica; NICULESCU-MIZIL; CARUANA, 2005).
 
 ### Curvas ROC, matrizes de confusão e Average Precision por classe
 
-As dez avaliações também são visualizadas em curvas ROC sobrepostas, radar multimétrico, heatmap e um painel de matrizes de confusão; o painel das matrizes origina as **Figuras 7 e 8** do TCC. Para o Random Forest, a matriz no hold-out mostra 2 Ativos corretos, 8 Ativos classificados como Churn, 6 Churn classificados como Ativo e 220 Churn corretos (Recall-Churn 0,97, 220 de 226). No TCC, a classe Churn é a positiva em todas as métricas por classe: falso positivo designa cliente Ativo classificado como Churn.
+As dez avaliações também são visualizadas em curvas ROC sobrepostas, radar multimétrico, heatmap e um painel de matrizes de confusão; o painel das matrizes origina as **Figuras 7 e 8** do TCC: a linha de cima (Logistic Regression, Decision Tree, Random Forest, Extra Trees, Gradient Boosting) vira `fig07-matrizes-confusao-a.pdf` e a de baixo (HistGradient Boosting, AdaBoost, KNN, Naive Bayes, SVM) vira `fig08-matrizes-confusao-b.pdf`. Para o Random Forest, a matriz no hold-out mostra 2 Ativos corretos, 8 Ativos classificados como Churn, 6 Churn classificados como Ativo e 220 Churn corretos (Recall-Churn 0,97, 220 de 226). No TCC, a classe Churn é a positiva em todas as métricas por classe: falso positivo designa cliente Ativo classificado como Churn.
 
 A célula de Average Precision por classe calcula também a **AP da classe Ativo**, com o score invertido. Contra um baseline de 0,042 (prevalência de Ativos no hold-out):
 
@@ -566,11 +629,11 @@ A célula de Average Precision por classe calcula também a **AP da classe Ativo
 | KNN | 0,9596 | 0,0608 | 1,43x |
 | Decision Tree | 0,9559 | 0,0418 | 0,99x |
 
-O Random Forest tem AP-Ativo inferior ao HistGradient Boosting e à Regressão Logística. O TCC (Seções 2.5 e 4.2) interpreta essa divergência lembrando que a Average Precision pondera de forma desproporcional o extremo inicial da ordenação, região em que a precisão é estimada sobre poucas observações. Por isso a comparação entre finalistas é feita adiante em cobertura fixa, e não pela AP-Ativo isolada.
+O Random Forest tem AP-Ativo inferior ao HistGradient Boosting e à Regressão Logística. O TCC (Seções 2.5 e 4.3) interpreta essa divergência lembrando que a Average Precision pondera de forma desproporcional o extremo inicial da ordenação, região em que a precisão é estimada sobre poucas observações. Por isso a comparação entre finalistas é feita adiante em cobertura fixa, e não pela AP-Ativo isolada.
 
 ### Análise do ponto de corte e curva Precision-Recall
 
-Esta célula origina as **Figuras 9 e 10** do TCC (Seção 4.4). O painel esquerdo mostra o Kappa e o F1-Macro calculados sobre as probabilidades out-of-fold do treino, onde o limiar foi de fato escolhido; a curva do teste aparece em cinza apenas como referência e não participa da escolha. O painel direito traz as curvas Precision-Recall por classe, que independem do limiar.
+Esta célula origina as **Figuras 9 e 10** do TCC (Seção 4.5), gravadas como `fig09-limiar-corte.pdf` e `fig10-curva-precision-recall.pdf`. O painel esquerdo mostra o Kappa e o F1-Macro calculados sobre as probabilidades out-of-fold do treino, onde o limiar foi de fato escolhido; a curva do teste aparece em cinza apenas como referência e não participa da escolha. O painel direito traz as curvas Precision-Recall por classe, que independem do limiar.
 
 A distribuição das probabilidades do Random Forest no hold-out tem mediana 0,7787 (mín. 0,1121, máx. 0,9714); no treino out-of-fold, mediana 0,7721. A proximidade entre as duas medianas confirma que o limiar derivado do treino transfere-se ao teste sem correção adicional. No limiar padrão de 0,50, 91,9% dos clientes do hold-out seriam classificados como Churn, abaixo da proporção real (95,8%).
 
@@ -591,7 +654,7 @@ Classification report do Random Forest no hold-out (limiar 0,38):
 
 ### O que faz
 
-Ordena os dez modelos por AUC, MCC, G-Mean e Kappa, e mede o grau de concordância entre os rankings pela correlação de Spearman. Corresponde à Seção 4.3 do TCC.
+Ordena os dez modelos por AUC, MCC, G-Mean e Kappa, e mede o grau de concordância entre os rankings pela correlação de Spearman. Corresponde à Seção 4.4 do TCC.
 
 ### Por que faz assim
 
@@ -621,7 +684,7 @@ Os quatro critérios elegem **três vencedores distintos**: Random Forest pela A
 
 ### O que faz
 
-Extrai do Random Forest treinado a importância de cada uma das onze features via impureza de Gini: a soma ponderada da redução de impureza que a feature produz em todos os splits de todas as árvores (BREIMAN, 2001). Origina a **Tabela 6** e as **Figuras 11 e 12** do TCC (Seção 4.6).
+Extrai do Random Forest treinado a importância de cada uma das onze features via impureza de Gini: a soma ponderada da redução de impureza que a feature produz em todos os splits de todas as árvores (BREIMAN, 2001). Origina a **Tabela 6** e as **Figuras 11 e 12** do TCC (Seção 4.7), gravadas como `fig11-importancia-gini.pdf` e `fig12-top5-gini.pdf`.
 
 ### Por que faz assim
 
@@ -665,7 +728,7 @@ ranking = sorted(features, key=importances, reverse=True)
 
 ### O que faz
 
-Compara a distribuição das 1.128 observações Churn originais com o subconjunto efetivamente retido no treino após o undersampling (902 no treino antes do balanceamento, reduzidas a 120 pela razão 3:1), usando duas métricas complementares: **PSI** (Population Stability Index) e **KS-test** (Kolmogorov-Smirnov, duas amostras). Origina a **Tabela 5** do TCC (Seção 4.5).
+Compara a distribuição das 1.128 observações Churn originais com o subconjunto efetivamente retido no treino após o undersampling (902 no treino antes do balanceamento, reduzidas a 120 pela razão 3:1), usando duas métricas complementares: **PSI** (Population Stability Index) e **KS-test** (Kolmogorov-Smirnov, duas amostras). Origina a **Tabela 5** do TCC (Seção 4.6).
 
 ### Por que faz assim
 
@@ -715,7 +778,7 @@ Churn completo: 1.128 clientes. Churn no treino, antes do balanceamento: 902. Ch
 
 - O peso da conclusão recai sobre o **PSI**. O KS entra como verificação complementar, e **não rejeitar a igualdade não equivale a demonstrá-la**: com 120 observações contra 1.128, a potência do teste é limitada.
 - A verificação alcança o **undersampling da classe majoritária**, não a expansão sintética da classe Ativo. Com quarenta observações originais, os testes teriam potência insuficiente para distinguir a distribuição sintética da original; essa validação permanece entre os trabalhos futuros.
-- A Seção 4.5.1 do TCC discute a alternativa de seleção orientada por informatividade (*one-sided selection*; KUBAT; MATWIN, 1997), registrada como trabalho futuro para bases maiores.
+- A Seção 4.6.1 do TCC discute a alternativa de seleção orientada por informatividade (*one-sided selection*; KUBAT; MATWIN, 1997), registrada como trabalho futuro para bases maiores.
 
 ---
 
@@ -723,7 +786,7 @@ Churn completo: 1.128 clientes. Churn no treino, antes do balanceamento: 902. Ch
 
 ### O que faz
 
-Calcula os **valores SHAP** (SHapley Additive exPlanations) via `TreeExplainer` para o Random Forest, e produz quatro análises: beeswarm com ranking, SHAP médio por classe real, dependence plots das principais features e waterfall plots de clientes típicos. Origina as **Figuras 13 a 19** do TCC (Seções 4.6 e 4.6.1).
+Calcula os **valores SHAP** (SHapley Additive exPlanations) via `TreeExplainer` para o Random Forest, e produz quatro análises: beeswarm com ranking, SHAP médio por classe real, dependence plots das principais features e waterfall plots de clientes típicos. Origina as **Figuras 13 a 19** do TCC (Seções 4.7 e 4.7.1). A importância média vira `fig13-shap-importancia-media.pdf` e o beeswarm `fig14-shap-beeswarm.pdf`, este com os marcadores rasterizados.
 
 ### Por que faz assim
 
@@ -762,18 +825,18 @@ As quatro features mais relevantes ocupam posições **idênticas** nos dois ran
 | `recency_days` | +0,895 | Mais dias sem comprar empurra a predição para Churn |
 | `n_categories` | -0,648 | Mais categorias empurra a predição para Ativo (efeito protetor) |
 
-**Dependence plots** (Figuras 15 a 17, arquivo `apendiceA_dependence.png`), conforme a leitura do TCC:
+**Dependence plots** (Figuras 15 a 17, um PDF por painel: `fig15-shap-dependence-frequency.pdf`, `fig16-shap-dependence-recency.pdf`, `fig17-shap-dependence-ncategories.pdf`), conforme a leitura do TCC. O nome do arquivo é escolhido pela feature exibida, e não pela ordem dos painéis; se uma feature fora dessas três aparecer no top 3, a célula avisa e grava `fig-dependence-<feature>.pdf`.
 
 - `frequency`: dois agrupamentos disjuntos. Clientes com dois pedidos recebem contribuição positiva para o churn (entre +0,08 e +0,15); com três ou mais, contribuição negativa. É um limiar de decisão, não uma tendência gradual.
 - `recency_days`: relação monotônica crescente, aproximadamente sigmoide, com a transição de negativo para positivo em torno da média da distribuição padronizada.
 - `n_categories`: repete a descontinuidade de `frequency`, com separação nítida entre uma ou duas categorias e três ou mais.
 
-**Waterfall plots** (Figuras 18 e 19, arquivos `apendiceA_waterfall_ativo.png` e `apendiceA_waterfall_churn.png`), para o cliente mais próximo do centroide de cada classe no hold-out:
+**Waterfall plots** (Figuras 18 e 19, arquivos `fig18-shap-waterfall-ativo.pdf` e `fig19-shap-waterfall-churn.pdf`), para o cliente mais próximo do centroide de cada classe no hold-out:
 
 - **Cliente típico Churn** (índice 159): P(Churn) = 0,841, consistente com a classe real. O deslocamento vem principalmente de frequência (+0,12), diversidade de categorias (+0,08) e parcelamento médio (+0,07).
 - **Cliente típico Ativo** (índice 108): P(Churn) = 0,613, acima do limiar de 0,38, portanto **classificado incorretamente como Churn**. Tem frequência e diversidade de categorias abaixo da média, e as contribuições que o afastam do churn (parcelamento médio -0,06, recência -0,03) não compensam. O TCC usa o caso para ilustrar o Recall-Ativo de 0,20: o perfil médio de quem retorna não é suficientemente distinto do perfil de quem abandona, limitação do tamanho da classe minoritária e não da especificação do modelo.
 
-**Perfil do cliente que retorna** (Seção 4.6.1 do TCC): invertendo a leitura das contribuições SHAP, o cliente com maior propensão a retornar compra com mais frequência, mantém recência baixa e compra em mais categorias distintas. Parcelamento médio elevado associa-se a maior risco, possivelmente por sinalizar compras pontuais de maior ticket. O perfil deve ser lido como hipótese robusta a confirmar em bases maiores, dada a classe Ativo de cerca de 50 clientes.
+**Perfil do cliente que retorna** (Seção 4.7.1 do TCC): invertendo a leitura das contribuições SHAP, o cliente com maior propensão a retornar compra com mais frequência, mantém recência baixa e compra em mais categorias distintas. Parcelamento médio elevado associa-se a maior risco, possivelmente por sinalizar compras pontuais de maior ticket. O perfil deve ser lido como hipótese robusta a confirmar em bases maiores, dada a classe Ativo de cerca de 50 clientes.
 
 > **Ressalva metodológica importante.** A concordância entre Gini e SHAP **não constitui validação independente**: a importância de Gini mede redução de impureza nas árvores já ajustadas, e o TreeSHAP percorre exatamente essas mesmas árvores. A concordância é esperada por construção. É por isso que existem as duas análises seguintes: a comparação SHAP entre modelos de naturezas distintas e a estabilidade da ordenação entre partições.
 
@@ -825,7 +888,7 @@ Na execução de referência, os três caminhos primários funcionaram.
 | RF x RL | 0,7091 | 0,0146 | 6 de 11 |
 | HistGB x RL | 0,7091 | 0,0146 | 8 de 11 |
 
-**Leitura (Seção 4.6 do TCC)**:
+**Leitura (Seção 4.7 do TCC)**:
 
 - **A recência ocupa a 2ª posição nos três modelos**, sem exceção: é o achado mais robusto da análise de interpretabilidade.
 - **A frequência lidera nos dois ensembles** e cai para 3ª no modelo linear, coerente com o efeito descontínuo (dois pedidos contra três ou mais) visto nos dependence plots, que um modelo linear captura só parcialmente.
@@ -837,7 +900,7 @@ Na execução de referência, os três caminhos primários funcionaram.
 
 ## Estabilidade da Importância entre Partições e Comparação entre Estimadores
 
-*(corresponde à Seção 4.6 do TCC; no PDF final, a Seção 4.6.1 é o perfil do cliente que retorna)*
+*(corresponde à Seção 4.7 do TCC; a Seção 4.7.1 é o perfil do cliente que retorna)*
 
 ### O que faz
 
@@ -897,13 +960,13 @@ Para cada semente de 0 a 29: split estratificado 80/20, imputação e escala aju
 
 ### O que faz
 
-Aplica o Random Forest treinado a toda a base de 1.178 clientes, atribuindo a cada um uma **probabilidade contínua** P(Churn), e segmenta os clientes em quatro faixas de risco com cortes fixos (0,25 / 0,50 / 0,75). Em seguida valida a segmentação pela taxa de churn observada, compara a distribuição dos scores entre os três finalistas, repete tudo fora da amostra e mede a captura em cobertura fixa. Corresponde às Seções 4.2 e 4.7 do TCC, com a **Tabela 8** e a **Figura 20**.
+Aplica o Random Forest treinado a toda a base de 1.178 clientes, atribuindo a cada um uma **probabilidade contínua** P(Churn), e segmenta os clientes em quatro faixas de risco com cortes fixos (0,25 / 0,50 / 0,75). Em seguida valida a segmentação pela taxa de churn observada, compara a distribuição dos scores entre os três finalistas, repete tudo fora da amostra e mede a captura em cobertura fixa. Corresponde às Seções 4.3 e 4.8 do TCC, com a **Tabela 8** e a **Figura 20**.
 
 ### Por que faz assim
 
 **Reposicionamento metodológico**: a classificação binária tem qualidade limitada neste dataset (MCC de 0,19 para o Random Forest), consequência direta do tamanho reduzido da classe Ativo. Por isso, o entregável principal não é uma decisão sim/não, e sim uma probabilidade contínua que ordena os clientes por risco. Em vez de forçar uma decisão binária com support de 10 amostras, a segmentação em faixas permite priorizar investimento até o limite do orçamento de retenção, o que é economicamente preferível à reaquisição (REICHHELD; SCHEFTER, 2000).
 
-**Por que esses cortes?** Os limiares de 25%, 50% e 75% são **cortes nominais** da escala de probabilidade, adotados por interpretabilidade e não otimizados sobre os dados; sua adequação é aferida a posteriori pela taxa de churn observada em cada faixa (TCC, Seção 4.7). Não confundir com o limiar de classificação (0,38 no Random Forest), que é parâmetro da regra de decisão binária. A segmentação por risco para campanhas de retenção segue Kotler e Keller (2016).
+**Por que esses cortes?** Os limiares de 25%, 50% e 75% são **cortes nominais** da escala de probabilidade, adotados por interpretabilidade e não otimizados sobre os dados; sua adequação é aferida a posteriori pela taxa de churn observada em cada faixa (TCC, Seção 4.8). Não confundir com o limiar de classificação (0,38 no Random Forest), que é parâmetro da regra de decisão binária. A segmentação por risco para campanhas de retenção segue Kotler e Keller (2016).
 
 ### Como faz
 
@@ -929,7 +992,7 @@ A Tabela 8 do TCC traz critério, clientes, recência média e a ação recomend
 
 ### Figura 20, distribuição dos scores nos três modelos
 
-A célula gera `figura9_scores.png` (nome de arquivo histórico; é a **Figura 20** do PDF final), com um painel por modelo e as três linhas de corte. Uma conferência interna verifica que o painel do Random Forest reproduz `rfm['churn_proba']` (divergência máxima de 2,22e-16).
+A célula gera `fig20-distribuicao-scores.pdf` (antes `figura9_scores.png`), a **Figura 20** do TCC, com um painel por modelo e as três linhas de corte. Uma conferência interna verifica que o painel do Random Forest reproduz `rfm['churn_proba']` (divergência máxima de 2,22e-16).
 
 ### Validação da segmentação pela taxa de churn observada
 
@@ -944,7 +1007,7 @@ A tabela acima mostra apenas quantos clientes caem em cada faixa; isso não demo
 
 Monotonicidade estrita confirmada (Baixo < Médio < Alto < Crítico), com amplitude de **77,6 pontos percentuais**. Como a taxa base de churn já é 95,8%, o lift sobre Churn tem teto natural em torno de 1,04x; a leitura relevante está no lift sobre **Ativo**.
 
-**Atenção à composição da base completa**: ela contém as 160 linhas efetivamente usadas no ajuste, entre elas os 40 clientes Ativos do treino, que caem **todos** nas faixas Baixo e Médio. Por isso o recorte Baixo + Médio (42 de 50 Ativos em 10,9% da base, lift 7,73x) mede em parte memorização e **não** é o número defendido. O recorte que sobrevive fora da amostra é a **exclusão da faixa Crítico** (ver a seguir), reportado nas Seções 4.2, 4.7 e na Conclusão do TCC.
+**Atenção à composição da base completa**: ela contém as 160 linhas efetivamente usadas no ajuste, entre elas os 40 clientes Ativos do treino, que caem **todos** nas faixas Baixo e Médio. Por isso o recorte Baixo + Médio (42 de 50 Ativos em 10,9% da base, lift 7,73x) mede em parte memorização e **não** é o número defendido. O recorte que sobrevive fora da amostra é a **exclusão da faixa Crítico** (ver a seguir), reportado nas Seções 4.3, 4.8 e na Conclusão do TCC.
 
 ### Diagnósticos comparativos: Random Forest, HistGradient Boosting e Regressão Logística
 
@@ -1007,7 +1070,7 @@ A progressão se mantém no hold-out (75,0% no Baixo, 99,3% no Crítico), com um
 
 No hold-out, a diferença entre Random Forest e HistGradient Boosting corresponde a um único cliente e não autoriza afirmar superioridade: o TCC não usa esse recorte para desempatar.
 
-**Recorte "fora da faixa Crítico"**, o número efetivamente citado nas Seções 4.2, 4.7 e na Conclusão:
+**Recorte "fora da faixa Crítico"**, o número efetivamente citado nas Seções 4.3, 4.8 e na Conclusão:
 
 | Modelo | Hold-out (Ativos / cobertura / lift) | Base completa (Ativos / cobertura / lift) |
 |---|---|---|
@@ -1019,7 +1082,7 @@ O lift do Random Forest é estável entre base completa e hold-out (2,34x contra
 
 ### Curva de captura em cobertura fixa
 
-**Por que existe.** O recorte "fora do Crítico" entrega frações diferentes da base em cada modelo (39,0%, 20,3% e 66,9%), então o lift mistura a qualidade da ordenação com o ponto onde o corte de 0,75 caiu em cada distribuição. Fixando a cobertura, os três modelos passam a ser avaliados sobre o mesmo orçamento de campanha, e o que sobra na comparação é só a **ordenação**. É a evidência decisiva da escolha do modelo de produção no TCC e uma das contribuições listadas na Conclusão.
+**Por que existe.** O recorte "fora do Crítico" entrega frações diferentes da base em cada modelo (39,0%, 20,3% e 66,9%), então o lift mistura a qualidade da ordenação com o ponto onde o corte de 0,75 caiu em cada distribuição. Fixando a cobertura, os três modelos passam a ser avaliados sobre o mesmo orçamento de campanha, e o que sobra na comparação é só a **ordenação**. Na versão anterior, era a evidência decisiva da escolha do modelo; como é medida no hold-out, passou a **caracterizar** os três finalistas (Quadro 3 do TCC), e a decisão foi transferida para a versão *out-of-fold* da mesma medida (ver [Escolha declarada do modelo de produção](#escolha-declarada-do-modelo-de-produção)).
 
 **Como faz.** Ordena os clientes do menor para o maior score de churn e conta quantos Ativos reais entram nos X% de menor score, para X de 10% a 60%. Calcula também a cobertura mínima para alcançar 90% e 100% dos Ativos. Salva `captura_cobertura_fixa.csv`.
 
@@ -1042,7 +1105,7 @@ O lift do Random Forest é estável entre base completa e hold-out (2,34x contra
 | HistGradient Boosting | 0,2559 | 0,7615 | 49,6% | 51,3% |
 | Logistic Regression | 0,1749 | 0,7075 | 52,5% | 58,5% |
 
-O Random Forest **lidera ou empata em todas as coberturas** de 10% a 60%, e alcança 90% dos Ativos abordando 35,6% do hold-out. Abaixo de 30% nenhum modelo passa de quatro acertos, e a partir de 60% os três alcançam todos os Ativos: a escolha do modelo só tem efeito operacional no intervalo intermediário, justamente onde o Random Forest tem vantagem. Na Regressão Logística, o lift de 0,98x em 20% de cobertura é indistinguível do acaso. O valor de 35,6% é o parâmetro de dimensionamento de campanha proposto na Seção 4.7 do TCC.
+O Random Forest **lidera ou empata em todas as coberturas** de 10% a 60%, e alcança 90% dos Ativos abordando 35,6% do hold-out. Abaixo de 30% nenhum modelo passa de quatro acertos, e a partir de 60% os três alcançam todos os Ativos: a escolha do modelo só tem efeito operacional no intervalo intermediário, justamente onde o Random Forest tem vantagem. Na Regressão Logística, o lift de 0,98x em 20% de cobertura é indistinguível do acaso. O valor de 35,6% é o parâmetro de dimensionamento de campanha proposto na Seção 4.8 do TCC.
 
 > **Ressalva a manter.** O hold-out tem apenas 10 Ativos: cada unidade capturada vale 10 pontos percentuais de recall, e diferenças de um cliente entre modelos não são conclusivas. A mesma curva é impressa na base completa como referência de tendência, mas contém observações de treino e não mede desempenho preditivo.
 
@@ -1055,7 +1118,7 @@ A última célula da seção reúne num único bloco todo número que o texto ci
 | ROC-AUC | 0,8106 | 0,7615 | 0,7075 |
 | AP (Churn) | 0,9905 | 0,9872 | 0,9838 |
 | CV-AUC (dp) | 0,6814 (0,0661) | 0,7363 (0,0487) | 0,6326 (0,0466) |
-| \|CV - hold-out\| | 0,1293 | 0,0252 | 0,0749 |
+| Δ (CV − hold-out), com sinal | −0,1293 | −0,0252 | −0,0749 |
 | MCC | 0,1931 | 0,2143 | 0,3517 |
 | Kappa | 0,1918 | 0,2110 | 0,2939 |
 | G-Mean | 0,4412 | 0,5342 | 0,4462 |
@@ -1093,13 +1156,20 @@ Arquivo `olist_churn_predictions.csv` com **1.178 linhas e 10 colunas**, salvo e
 | Arquivo | Origem | Uso no TCC |
 |---|---|---|
 | `olist_churn_predictions.csv` | Seção 10 | Entregável operacional |
-| `apendiceA_dependence.png` | Seção 8.6 | Figuras 15 a 17 |
-| `apendiceA_waterfall_ativo.png`, `apendiceA_waterfall_churn.png` | Seção 8.6 | Figuras 18 e 19 |
+| `fig01-pipeline.pdf`, `fig02-janela-temporal.pdf` | Figuras de fechamento | Figuras 1 e 2 |
+| `fig03-eda-recencia.pdf` a `fig06-proporcao-churn-ativo.pdf` | Seção 5 | Figuras 3 a 6 |
+| `fig07-matrizes-confusao-a.pdf`, `fig08-matrizes-confusao-b.pdf` | Seção 7 | Figuras 7 e 8 |
+| `fig09-limiar-corte.pdf`, `fig10-curva-precision-recall.pdf` | Seção 7 | Figuras 9 e 10 |
+| `fig11-importancia-gini.pdf`, `fig12-top5-gini.pdf` | Seção 8 | Figuras 11 e 12 |
+| `fig13-shap-importancia-media.pdf`, `fig14-shap-beeswarm.pdf` | Seção 8.6 | Figuras 13 e 14 |
+| `fig15-shap-dependence-frequency.pdf` a `fig17-shap-dependence-ncategories.pdf` | Seção 8.6 | Figuras 15 a 17 |
+| `fig18-shap-waterfall-ativo.pdf`, `fig19-shap-waterfall-churn.pdf` | Seção 8.6 | Figuras 18 e 19 |
+| `fig20-distribuicao-scores.pdf` | Seção 9 | Figura 20 |
 | `tabela7_shap_ranking.csv` | SHAP nos três modelos | Tabela 7 |
-| `figura9_scores.png` | Seção 9 | Figura 20 |
-| `captura_cobertura_fixa.csv` | Seção 9 | Seções 4.2 e 4.7 |
+| `captura_cobertura_fixa.csv` | Seção 9 | Seções 4.3 e 4.8 |
 | `consolidado_v8_tres_modelos.csv` | Seção 9 | Conferência dos números dos três modelos |
-| `figura1_pipeline.png`, `figura2_janelas.png` | Figuras de fechamento | Figuras 1 e 2 |
+
+Os PNG antigos (`apendiceA_*.png`, `figura1_pipeline.png`, `figura2_janelas.png`, `figura9_scores.png`) não são mais gerados; se ainda estiverem na pasta, são resíduos de execuções anteriores.
 
 ---
 
@@ -1111,7 +1181,83 @@ Duas células finais desenham os diagramas de síntese do TCC, com **todos os r�
 
 **Figura 2, janela temporal dupla**: o início da observação vem do primeiro pedido real da base (`obs_orders['order_purchase_timestamp'].min()`), não da constante `OBS_START`; as larguras das barras são proporcionais à duração efetiva de cada janela. Pedidos na janela de observação: 43.695. Pedidos na janela de predição: 34.174.
 
-Cada célula imprime ao final uma tabela de conferência que mapeia cada valor à seção correspondente do TCC.
+Cada célula imprime ao final uma tabela de conferência que mapeia cada valor à seção correspondente do TCC. As figuras são gravadas como `fig01-pipeline.pdf` e `fig02-janela-temporal.pdf`.
+
+---
+
+## Verificações Finais (Pontos 3 e 4 da banca)
+
+Três células, entre a da Figura 1 e a da Figura 2, respondem a objeções da banca. **Nenhuma altera resultado algum**: só leem o que já está em memória. Ficam no fim porque dependem de objetos criados ao longo do notebook (`tr_idx`, `results` com `oof_prob`, `curva_captura`, `BINS_RISCO`), mas o argumento que sustentam vem **antes** no texto do TCC: a seleção do modelo e a verificação da imputação precedem qualquer número medido no hold-out. Cada célula abre com uma "nota de ordem" que registra isso.
+
+### Verificação 1, imputação de nível 1 e a fronteira treino/teste (Ponto 3)
+
+**Pergunta da orientadora**: em que etapa e sobre qual subconjunto as medianas da construção de features foram estimadas?
+
+**Como faz.** Reconstrói a tabela transacional sem imputação, conta os ausentes, recalcula as medianas usando só clientes do treino e mede quantos valores de feature mudariam nos 1.178 clientes modelados.
+
+**Resultado obtido:**
+
+| Coluna | Ausentes | Mediana global (usada) | Mediana só no treino | Situação |
+|---|---|---|---|---|
+| `review_score` | 442 (0,84%) | 5,00 | 5,00 | Viva, alimenta `avg_review_score` |
+| `payment_value` | 3 (0,01%) | 105,37 | 96,22 | Morta, nenhuma feature a lê (imputação removida) |
+| `order_value` | 1 de 43.695 pedidos | 103,55 | 95,94 | Viva, alimenta `monetary` e `avg_ticket` |
+
+A tabela tem 52.915 linhas de 42.395 clientes; os 1.178 modelados são 2,78% dela e os 236 do hold-out, 0,56%. As medianas são, portanto, determinadas quase só por clientes que não estão nem no treino nem no teste. A mediana de `review_score` é idêntica nas duas versões; a de `order_value` difere, mas incide sobre um único pedido, de cliente fora da amostra de modelagem.
+
+| Feature | Clientes alterados | Diferença máxima |
+|---|---|---|
+| `avg_review_score` | 0 | 0 |
+| `monetary` | 0 | 0 |
+| `avg_ticket` | 0 | 0 |
+
+**Leitura (TCC, Seção 3.5):** o vazamento entre partições é **numericamente nulo nesta base**. O TCC reconhece que estimar as medianas só no treino é o procedimento correto e que a equivalência é propriedade da base, não garantia do procedimento; a reordenação entra como trabalho futuro 10.
+
+### Verificação 2, seleção sobre o treino (Ponto 4)
+
+**Objeção**: o hold-out foi usado para comparar os dez algoritmos e fundamentar a escolha, deixando de ser estimativa final independente.
+
+**Como faz.** Refaz a comparação usando só as probabilidades *out-of-fold* do treino (n = 942, 40 Ativos), as mesmas de onde já saía o limiar. Calcula AUC-OOF, AP das duas classes, captura e lift em 30% e 40% de cobertura e a cobertura necessária para 90% dos Ativos. A AUC de hold-out aparece só como coluna de referência.
+
+**Resultado obtido:**
+
+| # | Modelo | AUC-OOF | AP-Ativo-OOF | Cap@30% | Lift@30% | Cap@40% | Cob. p/ 90% | AUC hold-out |
+|---|---|---|---|---|---|---|---|---|
+| 1 | HistGradient Boosting | 0,7323 | 0,1066 | 25 | 2,08 | 29 | 63,3% | 0,7615 |
+| 2 | **Random Forest** | **0,6784** | 0,1199 | 23 | 1,91 | 24 | 77,7% | 0,8106 |
+| 3 | Extra Trees | 0,6739 | 0,1440 | 19 | 1,58 | 25 | 73,0% | 0,7491 |
+| 4 | Gradient Boosting | 0,6702 | 0,0838 | 21 | 1,75 | 23 | 66,3% | 0,6642 |
+| 5 | Naive Bayes | 0,6428 | 0,1461 | 19 | 1,58 | 25 | 77,6% | 0,6405 |
+| 6 | Logistic Regression | 0,6323 | 0,1472 | 18 | 1,50 | 22 | 79,4% | 0,7075 |
+| 7 | SVM | 0,6277 | 0,0724 | 20 | 1,66 | 24 | 83,3% | 0,7035 |
+| 8 | Decision Tree | 0,6087 | 0,0588 | 16 | 1,33 | 23 | 83,2% | 0,4772 |
+| 9 | KNN | 0,5957 | 0,0947 | 18 | 1,50 | 22 | 83,9% | 0,5336 |
+| 10 | AdaBoost | 0,5347 | 0,1129 | 15 | 1,25 | 18 | 90,3% | 0,5544 |
+
+Os rankings por AUC-OOF e por AUC de hold-out concordam bem (Spearman rho = 0,8424, p = 0,0022), mas não são iguais: **sob o critério de treino, o líder é o HistGradient Boosting**, não o Random Forest, que é o líder no hold-out. O veredito impresso pela célula diz isso ("A escolha do modelo precisa ser reexaminada") e lista o líder em cada critério: AUC-OOF e Cap@30%, HistGradient Boosting; AP-Ativo-OOF, Regressão Logística.
+
+Foi esse resultado que levou ao procedimento de dois estágios do TCC. Com o HistGradient Boosting fora por não expor importância de Gini (objetivo específico 4), o Random Forest lidera os elegíveis em AUC-OOF e em captura a 30%.
+
+### Verificação 2b, segmentação sobre o treino
+
+**Por que existe.** A Verificação 2 mede ordenação pura, e nela o HistGradient Boosting ganha. Esta célula testa o outro critério do trabalho: a **segmentação em faixas**, com os mesmos cortes absolutos da Tabela 8, e o recorte "fora do Crítico" que dela resulta, agora sobre as probabilidades *out-of-fold* do treino e não sobre o hold-out (9/10, lift 2,31) ou a base completa.
+
+**Resultado obtido** (prevalência de Ativo no treino = 4,2%):
+
+| Modelo | Baixo | Médio | Alto | Crítico | % no Crítico | Ativos fora do Crítico | Recall-Ativo | Cobertura | Lift | IQR do score |
+|---|---|---|---|---|---|---|---|---|---|---|
+| HistGradient Boosting | 68 | 77 | 90 | 707 | 75,1% | 22/40 | 0,550 | 24,9% | 2,20 | 0,2389 |
+| Gradient Boosting | 63 | 47 | 64 | 768 | 81,5% | 15/40 | 0,375 | 18,5% | 2,03 | 0,1522 |
+| **Random Forest** | 11 | 79 | 334 | 518 | 55,0% | **28/40** | 0,700 | 45,0% | 1,56 | 0,2050 |
+| Decision Tree | 144 | 25 | 145 | 628 | 66,7% | 20/40 | 0,500 | 33,3% | 1,50 | 0,3793 |
+| Naive Bayes | 141 | 82 | 224 | 495 | 52,5% | 27/40 | 0,675 | 47,5% | 1,42 | 0,4408 |
+| Extra Trees | 4 | 97 | 451 | 390 | 41,4% | 31/40 | 0,775 | 58,6% | 1,32 | 0,2064 |
+| SVM | 60 | 203 | 307 | 372 | 39,5% | 29/40 | 0,725 | 60,5% | 1,20 | 0,3324 |
+| Logistic Regression | 38 | 319 | 371 | 214 | 22,7% | 35/40 | 0,875 | 77,3% | 1,13 | 0,3214 |
+| KNN | 126 | 285 | 245 | 286 | 30,4% | 29/40 | 0,725 | 69,6% | 1,04 | 0,4926 |
+| AdaBoost | 0 | 105 | 836 | 1 | 0,1% | 40/40 | 1,000 | 99,9% | 1,00 | 0,0340 |
+
+**Como ler.** Lift alto com cobertura pequena e recall baixo é um recorte preciso, porém estreito, que perde a maior parte dos Ativos. O critério do trabalho é reter o máximo de Ativos fora do Crítico a um custo de cobertura aceitável, então recall e cobertura se leem juntos, nunca o lift isolado. A coluna "% no Crítico" mede a granularidade: um modelo que empilha a base numa faixa não prioriza, ainda que ordene bem. Entre os três finalistas, o Random Forest retém 28 de 40 Ativos em 45,0% de cobertura; o HistGradient Boosting, 22 em 24,9%; a Regressão Logística, 35 em 77,3%, cobertura que descaracteriza a priorização.
 
 ---
 
@@ -1123,9 +1269,10 @@ Cada célula imprime ao final uma tabela de conferência que mapeia cada valor �
 - Random Forest adotado como modelo de produção por decisão declarada (`MODELO_PRODUCAO`), com ROC-AUC = 0,8106 e AP-Churn = 0,9905 no hold-out, líder nas duas métricas independentes de limiar
 - O desempenho esperado em uso é o indicado pela CV-AUC (0,6814) e pela média de trinta partições (0,6686 ± 0,0831): a partição de referência situa-se na faixa superior da distribuição amostral
 - Não é o melhor modelo sob as métricas de decisão binária: a Regressão Logística lidera MCC (0,3517) e Kappa (0,2939), o HistGradient Boosting lidera G-Mean (0,5342) e Recall-Ativo (0,30)
-- A escolha se sustenta na natureza do entregável (priorização em faixas, não decisão binária) e na **captura em cobertura fixa**: 90% dos Ativos do hold-out alcançados abordando 35,6% da base, contra 49,6% do HistGradient Boosting e 52,5% da Regressão Logística
-- O HistGradient Boosting fica registrado como alternativa para maximizar a detecção da classe minoritária, condicionada a calibração de probabilidades
-- Nenhum modelo foi descartado por sobreajuste; o Δ CV-holdout é reportado, não usado como filtro
+- A escolha é feita **sem o hold-out**, em dois estágios: elegibilidade pela importância nativa de Gini e, entre os elegíveis, maior AUC-OOF (0,6784) e segmentação mais utilizável sobre o treino (28 de 40 Ativos fora do Crítico, 45,0% de cobertura)
+- O HistGradient Boosting tem a maior AUC-OOF dos dez (0,7323) e fica de fora por interpretabilidade, não por ordenação; sua segmentação concentra 75,1% no Crítico. Fica registrado como alternativa, condicionada a calibração de probabilidades
+- No hold-out, usado uma única vez, o Random Forest alcança 90% dos Ativos abordando 35,6% da base, contra 49,6% do HistGradient Boosting e 52,5% da Regressão Logística: caracterização, não fundamento da escolha
+- Nenhum modelo foi sinalizado por sobreajuste; o Δ agora tem sinal, e o Δ do Random Forest (−0,1293) é negativo, sem leitura de sobreajuste
 
 **Sobre os drivers de churn** (Gini, estabilidade entre partições e SHAP em três modelos):
 - **Frequência de compras** é o driver mais robusto: 1º por Gini (23,19%), 1º em 30 de 30 partições e 1º nos dois ensembles por SHAP
@@ -1140,6 +1287,8 @@ Cada célula imprime ao final uma tabela de conferência que mapeia cada valor �
 - A divergência entre rankings de AUC e métricas robustas (Spearman entre 0,30 e 0,65, três vencedores distintos) confirma a necessidade do portfólio multi-métrica
 - A concordância entre Gini e SHAP não é tratada como validação independente
 - O protocolo de validação cruzada e de ajuste de limiar foi corrigido; a reamostragem fora do fold inflava a CV-AUC em até 0,3251, e escolher o limiar no teste inflava o Kappa em 0,0336
+- A imputação feita antes do split não vaza informação nesta base: nenhuma das três features afetadas muda em nenhum dos 1.178 clientes quando as medianas são estimadas só no treino
+- Com dez Ativos no hold-out, o erro padrão da ROC-AUC é da ordem de 0,09 (HANLEY; MCNEIL, 1982): diferenças entre CV e hold-out dessa magnitude são variabilidade amostral, não sobreajuste
 
 **Sobre a aplicação de negócio**:
 - 1.178 clientes com score e segmento de risco atribuídos; taxa de churn observada estritamente monotônica entre as faixas (22,2% a 99,9%)
@@ -1155,6 +1304,8 @@ Cada célula imprime ao final uma tabela de conferência que mapeia cada valor �
 5. **Label Encoding** trata categorias como grandeza ordenada; a validação quantitativa do oversampling gaussiano não foi feita
 6. **Período histórico**: o dataset cobre 2016 a 2018 e pode não refletir dinâmicas atuais do mercado
 7. **Variabilidade entre versões de bibliotecas**: mesmo com semente fixa, mudanças no scikit-learn podem produzir variações marginais nas métricas e na ordenação de features próximas
+8. **Generalização temporal não avaliada**: as trinta partições são sorteios do mesmo período e medem sensibilidade ao particionamento, não desempenho em períodos futuros
+9. **Seleção indica tendência**: as diferenças entre os modelos elegíveis cabem dentro de um desvio padrão da variabilidade entre partições
 
 ### Trabalhos futuros (conforme a Conclusão do TCC)
 
@@ -1167,6 +1318,8 @@ Cada célula imprime ao final uma tabela de conferência que mapeia cada valor �
 7. Calibração de probabilidades (Platt scaling ou regressão isotônica) para os modelos de boosting
 8. Exposição do modelo via protocolo MCP, para consulta de scores e explicações SHAP em linguagem natural
 9. Codificação alternativa das variáveis categóricas (target encoding ou agrupamento de categorias raras)
+10. Reordenação do tratamento de ausências, estimando as medianas de imputação após o split treino/teste (efeito nulo nesta base, mas elimina a dependência dessa propriedade empírica)
+11. Validação de generalização temporal por múltiplos cortes cronológicos ou esquema *rolling-origin*
 
 ---
 
@@ -1213,8 +1366,9 @@ Cada célula imprime ao final uma tabela de conferência que mapeia cada valor �
 - **FRIEDMAN (2001)**, Gradient Boosting: algoritmos comparados (Seção 7)
 - **VAFEIADIS et al. (2015)**, Comparação de algoritmos para churn: desenho do benchmark (Seção 7)
 - **FAWCETT (2006)**, ROC analysis: ajuste de limiar (Seção 7)
-- **CAWLEY; TALBOT (2010)**, Viés de seleção na avaliação: limiar derivado do treino (Seção 7)
+- **CAWLEY; TALBOT (2010)**, Viés de seleção na avaliação: limiar e escolha do modelo derivados do treino (Seção 7 e Verificações Finais)
 - **HASTIE; TIBSHIRANI; FRIEDMAN (2009)**, Validação cruzada e comparação com hold-out (Seção 7)
+- **HANLEY; MCNEIL (1982)**, Erro padrão da ROC-AUC: alcance do diagnóstico Δ com dez Ativos no hold-out (Seção 7)
 - **DE LA CRUZ HUAYANAY; BAZÁN; RUSSO (2025)**, Métricas para classes desbalanceadas: protocolo multi-métrica e critério do limiar (Seções 7 e 7.1)
 - **SAITO; REHMSMEIER (2015)**, Curva Precision-Recall em desbalanceamento (Seção 7)
 - **CHICCO; JURMAN (2020)**, Vantagens do MCC (Seção 7)

@@ -1,0 +1,7 @@
+﻿Modelo,Escopo,AP-Ativo,ROC-AUC,Cobertura p/ 90% dos Ativos,Cobertura p/ 100% dos Ativos
+Random Forest,hold-out,0.1494,0.8106,0.3559,0.4492
+HistGradient Boosting,hold-out,0.2559,0.7615,0.4958,0.5127
+Logistic Regression,hold-out,0.1749,0.7075,0.5254,0.5847
+Random Forest,base completa,0.656,,0.225,0.4703
+HistGradient Boosting,base completa,0.5976,,0.275,0.4958
+Logistic Regression,base completa,0.1895,,0.6511,0.8413

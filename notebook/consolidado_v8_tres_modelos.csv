@@ -1,0 +1,4 @@
+﻿Modelo,ROC-AUC,AP,CV-AUC,MCC,Kappa,G-Mean,Rec-Ativo,Rec-Churn,Limiar,Lift fora do Crítico (hold-out),Lift fora do Crítico (base)
+Random Forest,0.8106,0.9905,0.6814,0.1931,0.1918,0.4412,0.2,0.9735,0.38,2.31,2.34
+HistGradient Boosting,0.7615,0.9872,0.7363,0.2143,0.211,0.5342,0.3,0.9513,0.18,1.48,3.84
+Logistic Regression,0.7075,0.9838,0.6326,0.3517,0.2939,0.4462,0.2,0.9956,0.12,1.49,1.31
